@@ -17,6 +17,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -34,6 +38,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -59,6 +64,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import eu.kanade.presentation.components.LocalHazeState
 import androidx.core.animation.doOnEnd
@@ -85,6 +92,7 @@ import eu.kanade.presentation.more.settings.screen.browse.MangaExtensionReposScr
 import eu.kanade.presentation.more.settings.screen.data.RestoreBackupScreen
 import eu.kanade.presentation.util.AssistContentScreen
 import eu.kanade.presentation.util.DefaultNavigatorScreenTransition
+import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.animesource.model.Hoster
 import eu.kanade.tachiyomi.animesource.model.Video
@@ -120,6 +128,7 @@ import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.system.updaterEnabled
 import eu.kanade.tachiyomi.util.view.setComposeContent
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
@@ -162,7 +171,7 @@ class MainActivity : BaseActivity() {
     private val getMangaIncognitoState: GetMangaIncognitoState by injectLazy()
 
     // To be checked by splash screen. If true then splash screen will be removed.
-    var ready = false
+    var ready by mutableStateOf(false)
 
     private var navigator: Navigator? = null
 
@@ -188,6 +197,14 @@ class MainActivity : BaseActivity() {
 
         setComposeContent {
             val context = LocalContext.current
+
+            var showCustomSplash by remember { mutableStateOf(true) }
+            LaunchedEffect(ready) {
+                if (ready) {
+                    delay(800)
+                    showCustomSplash = false
+                }
+            }
 
             var incognito by remember { mutableStateOf(getMangaIncognitoState.await(null)) }
             var incognitoAnime by remember { mutableStateOf(getAnimeIncognitoState.await(null)) }
@@ -277,6 +294,25 @@ class MainActivity : BaseActivity() {
                                         .alpha(0.8f)
                                         .background(MaterialTheme.colorScheme.surfaceContainer),
                                 )
+                            }
+
+                            AnimatedVisibility(
+                                visible = showCustomSplash,
+                                enter = EnterTransition.None,
+                                exit = fadeOut(animationSpec = tween(500)),
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.background),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_wordmark_splash),
+                                        contentDescription = null,
+                                        modifier = Modifier.width(240.dp),
+                                    )
+                                }
                             }
                         }
                     }
