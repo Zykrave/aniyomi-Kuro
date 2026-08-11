@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="splash">@color/accent_blue</color>
+    <color name="splash">#1B1B1F</color>
 
     <color name="cover_placeholder">#1F888888</color>
 
