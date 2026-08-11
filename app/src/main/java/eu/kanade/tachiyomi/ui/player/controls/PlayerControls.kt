@@ -164,15 +164,7 @@ fun PlayerControls(
             ConstraintLayout(
                 modifier = modifier
                     .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            Pair(0f, Color.Black),
-                            Pair(.2f, Color.Transparent),
-                            Pair(.7f, Color.Transparent),
-                            Pair(1f, Color.Black),
-                        ),
-                        alpha = transparentOverlay,
-                    )
+                    .background(Color.Black.copy(alpha = 0.6f * transparentOverlay))
                     .padding(horizontal = MaterialTheme.padding.medium),
             ) {
                 val (topLeftControls, topRightControls) = createRefs()

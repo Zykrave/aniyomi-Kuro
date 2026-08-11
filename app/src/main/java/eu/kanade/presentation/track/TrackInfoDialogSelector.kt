@@ -43,6 +43,7 @@ import tachiyomi.presentation.core.components.WheelNumberPicker
 import tachiyomi.presentation.core.components.WheelTextPicker
 import tachiyomi.presentation.core.components.material.AlertDialogContent
 import tachiyomi.presentation.core.components.material.padding
+import tachiyomi.presentation.core.components.material.radius
 import tachiyomi.presentation.core.i18n.stringResource
 
 @Composable
@@ -64,7 +65,7 @@ fun TrackStatusSelector(
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(MaterialTheme.radius.small))
                                 .selectable(
                                     selected = isSelected,
                                     onClick = { onSelectionChange(key) },

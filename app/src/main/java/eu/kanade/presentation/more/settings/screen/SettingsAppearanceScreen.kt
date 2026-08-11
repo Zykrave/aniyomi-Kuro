@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import eu.kanade.domain.ui.UiPreferences
+import eu.kanade.domain.ui.model.HomeCardStyle
 import eu.kanade.domain.ui.model.NavStyle
 import eu.kanade.domain.ui.model.StartScreen
 import eu.kanade.domain.ui.model.TabletUiMode
@@ -19,7 +20,6 @@ import eu.kanade.domain.ui.model.setAppCompatDelegateThemeMode
 import eu.kanade.presentation.more.settings.Preference
 import eu.kanade.presentation.more.settings.screen.appearance.AppLanguageScreen
 import eu.kanade.presentation.more.settings.widget.AppThemeModePreferenceWidget
-import eu.kanade.presentation.more.settings.widget.AppThemePreferenceWidget
 import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
@@ -57,11 +57,7 @@ object SettingsAppearanceScreen : SearchableSettings {
         val themeModePref = uiPreferences.themeMode()
         val themeMode by themeModePref.collectAsState()
 
-        val appThemePref = uiPreferences.appTheme()
-        val appTheme by appThemePref.collectAsState()
-
         val amoledPref = uiPreferences.themeDarkAmoled()
-        val amoled by amoledPref.collectAsState()
 
         return Preference.PreferenceGroup(
             title = stringResource(MR.strings.pref_category_theme),
@@ -77,12 +73,6 @@ object SettingsAppearanceScreen : SearchableSettings {
                                 setAppCompatDelegateThemeMode(it)
                             },
                         )
-
-                        AppThemePreferenceWidget(
-                            value = appTheme,
-                            amoled = amoled,
-                            onItemClick = { appThemePref.set(it) },
-                        )
                     }
                 },
                 Preference.PreferenceItem.SwitchPreference(
@@ -93,6 +83,14 @@ object SettingsAppearanceScreen : SearchableSettings {
                         (context as? Activity)?.let { ActivityCompat.recreate(it) }
                         true
                     },
+                ),
+                Preference.PreferenceItem.ListPreference(
+                    preference = uiPreferences.homeCardStyle(),
+                    entries = mapOf(
+                        HomeCardStyle.STANDARD to stringResource(MR.strings.home_card_style_standard),
+                        HomeCardStyle.COMPACT to stringResource(MR.strings.home_card_style_compact),
+                    ).toImmutableMap(),
+                    title = stringResource(MR.strings.pref_home_card_style),
                 ),
             ),
         )

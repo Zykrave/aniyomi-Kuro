@@ -5,8 +5,8 @@ import androidx.compose.ui.Modifier
 import aniyomi.domain.anime.SeasonAnime
 import aniyomi.domain.anime.SeasonDisplayMode
 import eu.kanade.presentation.library.components.DownloadsBadge
-import eu.kanade.presentation.library.components.EntryComfortableGridItem
-import eu.kanade.presentation.library.components.EntryCompactGridItem
+import eu.kanade.presentation.library.components.LibraryComfortableGridItem
+import eu.kanade.presentation.library.components.LibraryCompactGridItem
 import eu.kanade.presentation.library.components.EntryListItem
 import eu.kanade.presentation.library.components.LanguageBadge
 import eu.kanade.presentation.library.components.UnviewedBadge
@@ -38,7 +38,7 @@ fun AnimeSeasonListItem(
 
     when (anime.seasonDisplayGridMode) {
         SeasonDisplayMode.ComfortableGrid -> {
-            EntryComfortableGridItem(
+            LibraryComfortableGridItem(
                 title = title,
                 coverData = AnimeCover(
                     animeId = itemAnime.id,
@@ -67,7 +67,7 @@ fun AnimeSeasonListItem(
             )
         }
         SeasonDisplayMode.CompactGrid, SeasonDisplayMode.CoverOnlyGrid -> {
-            EntryCompactGridItem(
+            LibraryCompactGridItem(
                 title = title.takeIf { anime.seasonDisplayGridMode is SeasonDisplayMode.CompactGrid },
                 coverData = AnimeCover(
                     animeId = itemAnime.id,

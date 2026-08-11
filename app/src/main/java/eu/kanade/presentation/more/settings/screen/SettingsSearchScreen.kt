@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import eu.kanade.presentation.components.PillSearchToolbar
 import eu.kanade.presentation.components.UpIcon
 import eu.kanade.presentation.more.settings.Preference
 import eu.kanade.presentation.more.settings.screen.player.PlayerSettingsAdvancedScreen
@@ -101,57 +102,18 @@ class SettingsSearchScreen(
         Scaffold(
             topBar = {
                 Column {
-                    TopAppBar(
-                        navigationIcon = {
-                            val canPop = remember { navigator.canPop }
-                            if (canPop) {
-                                IconButton(onClick = navigator::pop) {
-                                    UpIcon()
-                                }
-                            }
-                        },
-                        title = {
-                            BasicTextField(
-                                state = textFieldState,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .focusRequester(focusRequester)
-                                    .runOnEnterKeyPressed(action = focusManager::clearFocus),
-                                textStyle = MaterialTheme.typography.bodyLarge
-                                    .copy(color = MaterialTheme.colorScheme.onSurface),
-                                lineLimits = TextFieldLineLimits.SingleLine,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                                onKeyboardAction = { focusManager.clearFocus() },
-                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                decorator = {
-                                    if (textFieldState.text.isEmpty()) {
-                                        Text(
-                                            text = stringResource(
-                                                resource = if (isPlayer) {
-                                                    AYMR.strings.action_search_player_settings
-                                                } else {
-                                                    MR.strings.action_search_settings
-                                                },
-                                            ),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                        )
-                                    }
-                                    it()
-                                },
-                            )
-                        },
-                        actions = {
-                            if (textFieldState.text.isNotEmpty()) {
-                                IconButton(onClick = { textFieldState.clearText() }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Close,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        },
+                    PillSearchToolbar(
+                        searchQuery = textFieldState.text.toString(),
+                        onChangeSearchQuery = { textFieldState.clearText(); textFieldState.edit { append(it ?: "") } },
+                        navigateUp = if (navigator.canPop) { { navigator.pop() } } else null,
+                        placeholderText = stringResource(
+                            resource = if (isPlayer) {
+                                AYMR.strings.action_search_player_settings
+                            } else {
+                                MR.strings.action_search_settings
+                            },
+                        ),
+                        onSearch = { focusManager.clearFocus() },
                     )
                     HorizontalDivider()
                 }

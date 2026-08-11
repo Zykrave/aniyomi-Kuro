@@ -50,6 +50,7 @@ import eu.kanade.tachiyomi.ui.entries.anime.track.AnimeTrackItem
 import eu.kanade.tachiyomi.util.lang.toLocalDate
 import eu.kanade.tachiyomi.util.system.copyToClipboard
 import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.components.material.radius
 import tachiyomi.presentation.core.i18n.stringResource
 import java.time.format.DateTimeFormatter
 
@@ -217,7 +218,7 @@ private fun TrackInfoItem(
                 .clip(MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                 .padding(8.dp)
-                .clip(RoundedCornerShape(6.dp)),
+                .clip(RoundedCornerShape(MaterialTheme.radius.extraSmall)),
         ) {
             Column {
                 Row(modifier = Modifier.height(IntrinsicSize.Min)) {

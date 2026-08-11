@@ -13,8 +13,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import eu.kanade.presentation.browse.BrowseSourceLoadingItem
 import eu.kanade.presentation.browse.InLibraryBadge
-import eu.kanade.presentation.library.components.CommonEntryItemDefaults
-import eu.kanade.presentation.library.components.EntryComfortableGridItem
+import eu.kanade.presentation.library.components.LibraryComfortableGridItem
 import kotlinx.coroutines.flow.StateFlow
 import tachiyomi.domain.entries.anime.model.Anime
 import tachiyomi.domain.entries.anime.model.AnimeCover
@@ -31,8 +30,8 @@ fun BrowseAnimeSourceComfortableGrid(
     LazyVerticalGrid(
         columns = columns,
         contentPadding = contentPadding + PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(CommonEntryItemDefaults.GridVerticalSpacer),
-        horizontalArrangement = Arrangement.spacedBy(CommonEntryItemDefaults.GridHorizontalSpacer),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (animeList.loadState.prepend is LoadState.Loading) {
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -63,7 +62,7 @@ private fun BrowseAnimeSourceComfortableGridItem(
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = onClick,
 ) {
-    EntryComfortableGridItem(
+    LibraryComfortableGridItem(
         title = anime.title,
         coverData = AnimeCover(
             animeId = anime.id,
@@ -72,7 +71,6 @@ private fun BrowseAnimeSourceComfortableGridItem(
             url = anime.thumbnailUrl,
             lastModified = anime.coverLastModified,
         ),
-        coverAlpha = if (anime.favorite) CommonEntryItemDefaults.BrowseFavoriteCoverAlpha else 1f,
         coverBadgeStart = {
             InLibraryBadge(enabled = anime.favorite)
         },

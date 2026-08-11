@@ -1,6 +1,7 @@
 package eu.kanade.presentation.browse.anime
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -15,8 +16,11 @@ import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.AnimeSearchItemRe
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.AnimeSearchScreenModel
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.AnimeSourceFilter
 import eu.kanade.tachiyomi.util.system.LocaleHelper
+import tachiyomi.i18n.MR
 import tachiyomi.domain.entries.anime.model.Anime
 import tachiyomi.presentation.core.components.material.Scaffold
+import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.screens.EmptyScreen
 
 @Composable
 fun GlobalAnimeSearchScreen(
@@ -48,6 +52,22 @@ fun GlobalAnimeSearchScreen(
             )
         },
     ) { paddingValues ->
+        if (state.searchQuery.isNullOrBlank()) {
+            EmptyScreen(
+                stringRes = MR.strings.action_search_hint,
+                modifier = Modifier.padding(paddingValues),
+            )
+            return@Scaffold
+        }
+
+        if (state.filteredItems.isEmpty() && state.progress == state.total) {
+            EmptyScreen(
+                stringRes = MR.strings.no_results_found,
+                modifier = Modifier.padding(paddingValues),
+            )
+            return@Scaffold
+        }
+
         GlobalSearchContent(
             items = state.filteredItems,
             contentPadding = paddingValues,

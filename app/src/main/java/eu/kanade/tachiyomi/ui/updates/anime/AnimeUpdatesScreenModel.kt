@@ -57,6 +57,7 @@ class AnimeUpdatesScreenModel(
     private val getUpdates: GetAnimeUpdates = Injekt.get(),
     private val getAnime: GetAnime = Injekt.get(),
     private val getEpisode: GetEpisode = Injekt.get(),
+    private val getLibraryAnime: tachiyomi.domain.entries.anime.interactor.GetLibraryAnime = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
     downloadPreferences: DownloadPreferences = Injekt.get(),
@@ -94,6 +95,16 @@ class AnimeUpdatesScreenModel(
                             items = updates.toUpdateItems(),
                         )
                     }
+                }
+        }
+
+        screenModelScope.launchIO {
+            getLibraryAnime.subscribe()
+                .collectLatest { library ->
+                    val continueWatching = library
+                        .filter { it.hasStarted && it.seenCount < it.totalCount }
+                        .sortedByDescending { it.lastSeen }
+                    mutableState.update { it.copy(continueWatching = continueWatching) }
                 }
         }
 
@@ -397,6 +408,7 @@ class AnimeUpdatesScreenModel(
     data class State(
         val isLoading: Boolean = true,
         val items: PersistentList<AnimeUpdatesItem> = persistentListOf(),
+        val continueWatching: List<tachiyomi.domain.library.anime.LibraryAnime> = emptyList(),
         val dialog: Dialog? = null,
     ) {
         val selected = items.filter { it.selected }

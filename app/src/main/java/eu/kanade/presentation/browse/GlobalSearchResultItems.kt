@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import tachiyomi.i18n.MR
@@ -35,7 +36,7 @@ fun GlobalSearchResultItem(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.padding(vertical = 12.dp)) {
         Row(
             modifier = Modifier
                 .padding(
@@ -50,9 +51,14 @@ fun GlobalSearchResultItem(
             Column {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
                 )
-                Text(text = subtitle)
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             IconButton(onClick = onClick) {
                 Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
@@ -71,9 +77,10 @@ fun GlobalSearchLoadingResultItem() {
     ) {
         CircularProgressIndicator(
             modifier = Modifier
-                .size(16.dp)
+                .size(24.dp)
                 .align(Alignment.Center),
             strokeWidth = 2.dp,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }

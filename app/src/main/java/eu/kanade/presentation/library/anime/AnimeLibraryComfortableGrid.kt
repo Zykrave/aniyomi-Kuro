@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastAny
 import eu.kanade.presentation.library.components.DownloadsBadge
-import eu.kanade.presentation.library.components.EntryComfortableGridItem
 import eu.kanade.presentation.library.components.LanguageBadge
 import eu.kanade.presentation.library.components.LazyLibraryGrid
+import eu.kanade.presentation.library.components.LibraryComfortableGridItem
 import eu.kanade.presentation.library.components.UnviewedBadge
 import eu.kanade.presentation.library.components.globalSearchItem
 import eu.kanade.tachiyomi.ui.library.anime.AnimeLibraryItem
@@ -37,12 +37,18 @@ internal fun AnimeLibraryComfortableGrid(
 
         items(
             items = items,
+            key = { it.libraryAnime.id },
             contentType = { "anime_library_comfortable_grid_item" },
         ) { libraryItem ->
             val anime = libraryItem.libraryAnime.anime
-            EntryComfortableGridItem(
+            LibraryComfortableGridItem(
                 isSelected = selection.fastAny { it.id == libraryItem.libraryAnime.id },
                 title = anime.title,
+                progress = if (libraryItem.libraryAnime.totalCount > 0) {
+                    libraryItem.libraryAnime.seenCount.toFloat() / libraryItem.libraryAnime.totalCount
+                } else {
+                    0f
+                },
                 coverData = AnimeCover(
                     animeId = anime.id,
                     sourceId = anime.source,

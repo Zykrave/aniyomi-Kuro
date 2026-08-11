@@ -496,7 +496,9 @@ private fun AnimeScreenSmallImpl(
                             onTrackingClicked = onTrackingClicked,
                             onEditIntervalClicked = onEditIntervalClicked,
                             onEditCategory = onEditCategoryClicked,
-                            modifier = Modifier.ignorePadding(offsetGridPaddingPx),
+                            modifier = Modifier
+                                .ignorePadding(offsetGridPaddingPx)
+                                .padding(vertical = 16.dp),
                         )
                     }
 
@@ -511,7 +513,9 @@ private fun AnimeScreenSmallImpl(
                             tagsProvider = { state.anime.genre },
                             onTagSearch = onTagSearch,
                             onCopyTagToClipboard = onCopyTagToClipboard,
-                            modifier = Modifier.ignorePadding(offsetGridPaddingPx),
+                            modifier = Modifier
+                                .ignorePadding(offsetGridPaddingPx)
+                                .padding(vertical = 16.dp),
                         )
                     }
 

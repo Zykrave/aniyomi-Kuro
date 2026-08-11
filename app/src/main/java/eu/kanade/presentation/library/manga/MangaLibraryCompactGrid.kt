@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastAny
 import eu.kanade.presentation.library.components.DownloadsBadge
-import eu.kanade.presentation.library.components.EntryCompactGridItem
 import eu.kanade.presentation.library.components.LanguageBadge
 import eu.kanade.presentation.library.components.LazyLibraryGrid
+import eu.kanade.presentation.library.components.LibraryCompactGridItem
 import eu.kanade.presentation.library.components.UnviewedBadge
 import eu.kanade.presentation.library.components.globalSearchItem
 import eu.kanade.tachiyomi.ui.library.manga.MangaLibraryItem
@@ -38,12 +38,18 @@ internal fun MangaLibraryCompactGrid(
 
         items(
             items = items,
+            key = { it.libraryManga.id },
             contentType = { "manga_library_compact_grid_item" },
         ) { libraryItem ->
             val manga = libraryItem.libraryManga.manga
-            EntryCompactGridItem(
+            LibraryCompactGridItem(
                 isSelected = selection.fastAny { it.id == libraryItem.libraryManga.id },
                 title = manga.title.takeIf { showTitle },
+                progress = if (libraryItem.libraryManga.totalChapters > 0) {
+                    libraryItem.libraryManga.readCount.toFloat() / libraryItem.libraryManga.totalChapters
+                } else {
+                    0f
+                },
                 coverData = MangaCover(
                     mangaId = manga.id,
                     sourceId = manga.source,

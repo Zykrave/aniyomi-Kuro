@@ -13,8 +13,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import eu.kanade.presentation.browse.BrowseSourceLoadingItem
 import eu.kanade.presentation.browse.InLibraryBadge
-import eu.kanade.presentation.library.components.CommonEntryItemDefaults
-import eu.kanade.presentation.library.components.EntryCompactGridItem
+import eu.kanade.presentation.library.components.LibraryCompactGridItem
 import kotlinx.coroutines.flow.StateFlow
 import tachiyomi.domain.entries.manga.model.Manga
 import tachiyomi.domain.entries.manga.model.MangaCover
@@ -31,8 +30,8 @@ fun BrowseMangaSourceCompactGrid(
     LazyVerticalGrid(
         columns = columns,
         contentPadding = contentPadding + PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(CommonEntryItemDefaults.GridVerticalSpacer),
-        horizontalArrangement = Arrangement.spacedBy(CommonEntryItemDefaults.GridHorizontalSpacer),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (mangaList.loadState.prepend is LoadState.Loading) {
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -63,7 +62,7 @@ private fun BrowseMangaSourceCompactGridItem(
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = onClick,
 ) {
-    EntryCompactGridItem(
+    LibraryCompactGridItem(
         title = manga.title,
         coverData = MangaCover(
             mangaId = manga.id,
@@ -72,7 +71,6 @@ private fun BrowseMangaSourceCompactGridItem(
             url = manga.thumbnailUrl,
             lastModified = manga.coverLastModified,
         ),
-        coverAlpha = if (manga.favorite) CommonEntryItemDefaults.BrowseFavoriteCoverAlpha else 1f,
         coverBadgeStart = {
             InLibraryBadge(enabled = manga.favorite)
         },

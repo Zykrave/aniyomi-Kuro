@@ -18,12 +18,21 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -35,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,8 +54,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
+import dev.chrisbanes.haze.HazeState
+import eu.kanade.presentation.components.LocalHazeState
 import androidx.core.animation.doOnEnd
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen
@@ -204,6 +219,7 @@ class MainActivity : BaseActivity() {
                     disposeSteps = true,
                 ),
             ) { navigator ->
+                val hazeState = remember { HazeState() }
 
                 LaunchedEffect(navigator) {
                     this@MainActivity.navigator = navigator
@@ -240,25 +256,28 @@ class MainActivity : BaseActivity() {
                     },
                     contentWindowInsets = scaffoldInsets,
                 ) { contentPadding ->
-                    // Consume insets already used by app state banners
-                    Box {
-                        // Shows current screen
-                        DefaultNavigatorScreenTransition(
-                            navigator = navigator,
-                            modifier = Modifier
-                                .padding(contentPadding)
-                                .consumeWindowInsets(contentPadding),
-                        )
-                        // Draw navigation bar scrim when needed
-                        if (remember { isNavigationBarNeedsScrim() }) {
-                            Spacer(
+                    CompositionLocalProvider(LocalHazeState provides hazeState) {
+                        // Consume insets already used by app state banners
+                        Box {
+                            AmbientBackground()
+                            // Shows current screen
+                            DefaultNavigatorScreenTransition(
+                                navigator = navigator,
                                 modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .fillMaxWidth()
-                                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                                    .alpha(0.8f)
-                                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                                    .padding(contentPadding)
+                                    .consumeWindowInsets(contentPadding),
                             )
+                            // Draw navigation bar scrim when needed
+                            if (remember { isNavigationBarNeedsScrim() }) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                                        .alpha(0.8f)
+                                        .background(MaterialTheme.colorScheme.surfaceContainer),
+                                )
+                            }
                         }
                     }
                 }
@@ -580,6 +599,75 @@ class MainActivity : BaseActivity() {
         }
         ExternalIntents.externalIntents.episodeId?.let {
             outState.putLong(SAVED_STATE_EPISODE_KEY, it)
+        }
+    }
+
+    @Composable
+    private fun AmbientBackground(modifier: Modifier = Modifier) {
+        val infiniteTransition = rememberInfiniteTransition(label = "ambient")
+        val offset1 by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(18000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "blob1",
+        )
+        val offset2 by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(24000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "blob2",
+        )
+        val scale1 by infiniteTransition.animateFloat(
+            initialValue = 0.9f,
+            targetValue = 1.1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(8000, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "scale1",
+        )
+        val scale2 by infiniteTransition.animateFloat(
+            initialValue = 0.9f,
+            targetValue = 1.1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(9500, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "scale2",
+        )
+        Canvas(modifier = modifier.fillMaxSize()) {
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+
+            val radius1 = canvasWidth * 0.5f * scale1
+            val center1 = Offset(canvasWidth * (0.2f + offset1 * 0.3f), canvasHeight * (0.15f + offset1 * 0.2f))
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(ComposeColor(0xFFFF4D6D).copy(alpha = 0.12f), ComposeColor.Transparent),
+                    center = center1,
+                    radius = radius1,
+                ),
+                radius = radius1,
+                center = center1,
+            )
+
+            val radius2 = canvasWidth * 0.45f * scale2
+            val center2 = Offset(canvasWidth * (0.8f - offset2 * 0.3f), canvasHeight * (0.7f - offset2 * 0.2f))
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(ComposeColor(0xFF5AC8FA).copy(alpha = 0.10f), ComposeColor.Transparent),
+                    center = center2,
+                    radius = radius2,
+                ),
+                radius = radius2,
+                center = center2,
+            )
         }
     }
 

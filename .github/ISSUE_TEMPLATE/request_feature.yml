@@ -1,12 +1,12 @@
 name: ⭐ Feature request
-description: Suggest a feature to improve Aniyomi
+description: Suggest a feature to improve Kuro
 labels: [Feature request]
 body:
   - type: textarea
     id: feature-description
     attributes:
       label: Describe your suggested feature
-      description: How can Aniyomi be improved?
+      description: How can Kuro be improved?
       placeholder: |
         Example:
           "It should work like this..."

@@ -1,10 +1,10 @@
 <div align="center">
 
 <a href="https://aniyomi.org">
-    <img src="./.github/assets/logo.png" alt="Aniyomi logo" title="Aniyomi logo" width="80"/>
+    <img src="./.github/assets/logo.png" alt="Kuro logo" title="Kuro logo" width="80"/>
 </a>
 
-# Aniyomi [App](#)
+# Kuro [App](#)
 
 ### Full-featured player and reader, based on ~~Tachiyomi~~ Mihon.
 Discover and watch anime, cartoons, series, and more – easier than ever on your Android device.
@@ -18,8 +18,8 @@ Discover and watch anime, cartoons, series, and more – easier than ever on you
 
 ## Download
 
-[![Aniyomi Stable](https://img.shields.io/github/release/aniyomiorg/aniyomi.svg?maxAge=3600&label=Stable&labelColor=06599d&color=043b69)](https://github.com/aniyomiorg/aniyomi/releases)
-[![Aniyomi Preview](https://img.shields.io/github/v/release/aniyomiorg/aniyomi-preview.svg?maxAge=3600&label=Beta&labelColor=2c2c47&color=1c1c39)](https://github.com/aniyomiorg/aniyomi-preview/releases)
+[![Kuro Stable](https://img.shields.io/github/release/aniyomiorg/aniyomi.svg?maxAge=3600&label=Stable&labelColor=06599d&color=043b69)](https://github.com/aniyomiorg/aniyomi/releases)
+[![Kuro Preview](https://img.shields.io/github/v/release/aniyomiorg/aniyomi-preview.svg?maxAge=3600&label=Beta&labelColor=2c2c47&color=1c1c39)](https://github.com/aniyomiorg/aniyomi-preview/releases)
 
 *Requires Android 8.0 or higher.*
 
@@ -57,7 +57,7 @@ Before reporting a new issue, take a look at the [FAQ](https://aniyomi.org/docs/
 Thank you to all the people who have contributed!
 
 <a href="https://github.com/aniyomiorg/aniyomi/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=aniyomiorg/aniyomi" alt="Aniyomi app contributors" title="Aniyomi app contributors" width="800"/>
+    <img src="https://contrib.rocks/image?repo=aniyomiorg/aniyomi" alt="Kuro app contributors" title="Kuro app contributors" width="800"/>
 </a>
 
 ### Disclaimer
@@ -69,7 +69,7 @@ The developer(s) of this application does not have any affiliation with the cont
 <pre>
 Copyright © 2015 Javier Tomás
 Copyright © 2024 Mihon Open Source Project
-Copyright © 2024 Aniyomi Open Source Project
+Copyright © 2024 Kuro Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

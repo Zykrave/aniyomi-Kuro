@@ -3,14 +3,22 @@ package eu.kanade.tachiyomi.ui.player.controls
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -64,80 +72,90 @@ fun MiddlePlayerControls(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier,
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.large),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        AnimatedVisibility(
-            visible = controlsShown && !areControlsLocked,
-            enter = enter,
-            exit = exit,
-        ) {
-            if (gestureSeekAmount == null) {
-                ControlsButton(
-                    Icons.Filled.SkipPrevious,
-                    onClick = onSkipPrevious,
-                    iconSize = 48.dp,
-                    enabled = hasPrevious,
-                )
-            }
-        }
-
-        val icon = AnimatedImageVector.animatedVectorResource(R.drawable.anim_play_to_pause)
-        val interaction = remember { MutableInteractionSource() }
-        when {
-            gestureSeekAmount != null -> {
-                Text(
-                    stringResource(
-                        AYMR.strings.player_gesture_seek_indicator,
-                        if (gestureSeekAmount.second >= 0) '+' else '-',
-                        Utils.prettyTime(abs(gestureSeekAmount.second)),
-                        Utils.prettyTime(gestureSeekAmount.first + gestureSeekAmount.second),
-                    ),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        shadow = Shadow(Color.Black, blurRadius = 5f),
-                    ),
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                )
-            }
-
-            (isLoading || isLoadingEpisode) && showLoadingCircle -> CircularProgressIndicator(Modifier.size(96.dp))
-            else -> {
-                AnimatedVisibility(
-                    visible = controlsShown && !areControlsLocked,
-                    enter = enter,
-                    exit = exit,
-                ) {
-                    Image(
-                        painter = rememberAnimatedVectorPainter(icon, !paused),
-                        modifier = Modifier
-                            .size(96.dp)
-                            .clip(CircleShape)
-                            .clickable(
-                                interaction,
-                                ripple(),
-                                onClick = onPlayPauseClick,
-                            )
-                            .padding(MaterialTheme.padding.medium),
-                        contentDescription = null,
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = controlsShown && !areControlsLocked,
+                enter = enter,
+                exit = exit,
+            ) {
+                if (gestureSeekAmount == null) {
+                    ControlsButton(
+                        Icons.Filled.SkipPrevious,
+                        onClick = onSkipPrevious,
+                        iconSize = 32.dp,
+                        enabled = hasPrevious,
                     )
                 }
             }
         }
 
-        AnimatedVisibility(
-            visible = controlsShown && !areControlsLocked,
-            enter = enter,
-            exit = exit,
-        ) {
-            if (gestureSeekAmount == null) {
-                ControlsButton(
-                    Icons.Filled.SkipNext,
-                    onClick = onSkipNext,
-                    iconSize = 48.dp,
-                    enabled = hasNext,
+        val icon = AnimatedImageVector.animatedVectorResource(R.drawable.anim_play_to_pause)
+        val interaction = remember { MutableInteractionSource() }
+        Box(modifier = Modifier.weight(2f), contentAlignment = Alignment.Center) {
+            when {
+                gestureSeekAmount != null -> {
+                    Text(
+                        stringResource(
+                            AYMR.strings.player_gesture_seek_indicator,
+                            if (gestureSeekAmount.second >= 0) '+' else '-',
+                            Utils.prettyTime(abs(gestureSeekAmount.second)),
+                            Utils.prettyTime(gestureSeekAmount.first + gestureSeekAmount.second),
+                        ),
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            shadow = Shadow(Color.Black, blurRadius = 5f),
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+
+                (isLoading || isLoadingEpisode) && showLoadingCircle -> CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    color = MaterialTheme.colorScheme.primary,
                 )
+
+                else -> {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = controlsShown && !areControlsLocked,
+                        enter = enter,
+                        exit = exit,
+                    ) {
+                        Image(
+                            painter = rememberAnimatedVectorPainter(icon, !paused),
+                            modifier = Modifier
+                                .size(96.dp)
+                                .clip(CircleShape)
+                                .clickable(
+                                    interaction,
+                                    ripple(),
+                                    onClick = onPlayPauseClick,
+                                )
+                                .padding(MaterialTheme.padding.medium),
+                            contentDescription = null,
+                        )
+                    }
+                }
+            }
+        }
+
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = controlsShown && !areControlsLocked,
+                enter = enter,
+                exit = exit,
+            ) {
+                if (gestureSeekAmount == null) {
+                    ControlsButton(
+                        Icons.Filled.SkipNext,
+                        onClick = onSkipNext,
+                        iconSize = 32.dp,
+                        enabled = hasNext,
+                    )
+                }
             }
         }
     }

@@ -41,6 +41,7 @@ dependencies {
     debugImplementation(compose.ui.tooling)
     implementation(compose.ui.tooling.preview)
     implementation(compose.ui.util)
+    implementation(compose.ui.fonts)
 
     implementation(androidx.paging.runtime)
     implementation(androidx.paging.compose)
