@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Aniyomi</string>
+    <string name="app_name" translatable="false">Kuro</string>
 
     <!-- Generic strings -->
     <string name="on">On</string>
@@ -226,6 +226,9 @@
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="pref_home_card_style">Continue watching card style</string>
+    <string name="home_card_style_standard">Standard</string>
+    <string name="home_card_style_compact">Compact</string>
     <string name="theme_monet">Dynamic</string>
     <string name="theme_greenapple">Green Apple</string>
     <string name="theme_lavender">Lavender</string>

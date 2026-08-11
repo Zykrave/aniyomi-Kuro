@@ -1,13 +1,17 @@
 package eu.kanade.presentation.browse.anime
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
 import eu.kanade.presentation.browse.anime.components.GlobalAnimeSearchToolbar
 import eu.kanade.tachiyomi.animesource.AnimeSource
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.AnimeSearchScreenModel
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.AnimeSourceFilter
 import tachiyomi.domain.entries.anime.model.Anime
+import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.Scaffold
+import tachiyomi.presentation.core.screens.EmptyScreen
 
 @Composable
 fun MigrateAnimeSearchScreen(
@@ -40,6 +44,22 @@ fun MigrateAnimeSearchScreen(
             )
         },
     ) { paddingValues ->
+        if (state.searchQuery.isNullOrBlank()) {
+            EmptyScreen(
+                stringRes = MR.strings.action_search_hint,
+                modifier = Modifier.padding(paddingValues),
+            )
+            return@Scaffold
+        }
+
+        if (state.filteredItems.isEmpty() && state.progress == state.total) {
+            EmptyScreen(
+                stringRes = MR.strings.no_results_found,
+                modifier = Modifier.padding(paddingValues),
+            )
+            return@Scaffold
+        }
+
         GlobalSearchContent(
             fromSourceId = fromSourceId,
             items = state.filteredItems,

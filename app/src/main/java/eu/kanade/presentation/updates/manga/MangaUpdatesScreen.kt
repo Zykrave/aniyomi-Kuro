@@ -1,10 +1,19 @@
 package eu.kanade.presentation.updates.manga
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,21 +21,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import eu.kanade.presentation.entries.components.EntryBottomActionMenu
 import eu.kanade.presentation.entries.manga.components.ChapterDownloadAction
+import eu.kanade.presentation.library.components.LibraryComfortableGridItem
+import eu.kanade.domain.ui.UiPreferences
+import eu.kanade.domain.ui.model.HomeCardStyle
 import eu.kanade.tachiyomi.data.download.manga.model.MangaDownload
 import eu.kanade.tachiyomi.ui.updates.manga.MangaUpdatesItem
 import eu.kanade.tachiyomi.ui.updates.manga.MangaUpdatesScreenModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import tachiyomi.domain.entries.manga.model.asMangaCover
 import tachiyomi.i18n.MR
+import tachiyomi.i18n.aniyomi.AYMR
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
 import tachiyomi.presentation.core.components.material.PullRefresh
 import tachiyomi.presentation.core.components.material.Scaffold
+import tachiyomi.presentation.core.components.material.padding
+import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.util.collectAsState
 import tachiyomi.presentation.core.screens.EmptyScreen
 import tachiyomi.presentation.core.screens.LoadingScreen
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +56,7 @@ fun MangaUpdateScreen(
     state: MangaUpdatesScreenModel.State,
     snackbarHostState: SnackbarHostState,
     lastUpdated: Long,
-    onClickCover: (MangaUpdatesItem) -> Unit,
+    onClickCover: (Long) -> Unit,
     onSelectAll: (Boolean) -> Unit,
     onInvertSelection: () -> Unit,
     onUpdateLibrary: () -> Boolean,
@@ -46,6 +67,9 @@ fun MangaUpdateScreen(
     onUpdateSelected: (MangaUpdatesItem, Boolean, Boolean, Boolean) -> Unit,
     onOpenChapter: (MangaUpdatesItem) -> Unit,
 ) {
+    val uiPreferences = remember { Injekt.get<UiPreferences>() }
+    val homeCardStyle by uiPreferences.homeCardStyle().collectAsState()
+
     BackHandler(enabled = state.selectionMode, onBack = { onSelectAll(false) })
 
     Scaffold(
@@ -90,17 +114,121 @@ fun MangaUpdateScreen(
                     ) {
                         mangaUpdatesLastUpdatedItem(lastUpdated)
 
-                        mangaUpdatesUiItems(
-                            uiModels = state.getUiModel(),
-                            selectionMode = state.selectionMode,
-                            onUpdateSelected = onUpdateSelected,
-                            onClickCover = onClickCover,
-                            onClickUpdate = onOpenChapter,
-                            onDownloadChapter = onDownloadChapter,
-                        )
+                        item(key = "home-continue-reading") {
+                            HomeShelf(title = stringResource(AYMR.strings.currently_reading)) {
+                                if (state.continueReading.isNotEmpty()) {
+                                    items(
+                                        items = state.continueReading,
+                                        key = { "continue-reading-${it.id}" },
+                                    ) { item ->
+                                        LibraryComfortableGridItem(
+                                            modifier = Modifier.width(if (homeCardStyle == HomeCardStyle.COMPACT) 90.dp else 128.dp),
+                                            title = item.manga.title,
+                                            coverData = item.manga.asMangaCover(),
+                                            progress = if (item.totalChapters > 0) {
+                                                item.readCount.toFloat() / item.totalChapters
+                                            } else {
+                                                0f
+                                            },
+                                            onClick = { onClickCover(item.manga.id) },
+                                            onLongClick = { /* Handle long click if needed */ },
+                                            compact = homeCardStyle == HomeCardStyle.COMPACT,
+                                        )
+                                    }
+                                } else {
+                                    item {
+                                        Text(
+                                            text = stringResource(MR.strings.information_no_recent),
+                                            modifier = Modifier.padding(MaterialTheme.padding.small),
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        item(key = "home-recently-updated") {
+                            val recentlyUpdated = state.items
+                                .distinctBy { it.update.mangaId }
+                                .take(20)
+                            HomeShelf(title = stringResource(MR.strings.label_recent_updates)) {
+                                if (recentlyUpdated.isNotEmpty()) {
+                                    items(
+                                        items = recentlyUpdated,
+                                        key = { "recently-updated-${it.update.mangaId}" },
+                                    ) { item ->
+                                        LibraryComfortableGridItem(
+                                            modifier = Modifier.width(128.dp),
+                                            title = item.update.mangaTitle,
+                                            coverData = item.update.coverData,
+                                            onClick = { onClickCover(item.update.mangaId) },
+                                            onLongClick = { /* Handle long click if needed */ },
+                                        )
+                                    }
+                                } else {
+                                    item {
+                                        Text(
+                                            text = stringResource(MR.strings.information_no_recent),
+                                            modifier = Modifier.padding(MaterialTheme.padding.small),
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        item(key = "home-new-chapters") {
+                            val newChapters = state.items.take(20)
+                            HomeShelf(title = stringResource(AYMR.strings.chapters_episodes)) {
+                                if (newChapters.isNotEmpty()) {
+                                    items(
+                                        items = newChapters,
+                                        key = { "new-chapters-${it.update.chapterId}" },
+                                    ) { item ->
+                                        LibraryComfortableGridItem(
+                                            modifier = Modifier.width(128.dp),
+                                            title = "${item.update.mangaTitle} - ${item.update.chapterName}",
+                                            coverData = item.update.coverData,
+                                            onClick = { onOpenChapter(item) },
+                                            onLongClick = { onUpdateSelected(item, !item.selected, true, true) },
+                                        )
+                                    }
+                                } else {
+                                    item {
+                                        Text(
+                                            text = stringResource(MR.strings.information_no_recent),
+                                            modifier = Modifier.padding(MaterialTheme.padding.small),
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun HomeShelf(
+    title: String,
+    modifier: Modifier = Modifier,
+    content: LazyListScope.() -> Unit,
+) {
+    Column(modifier = modifier.padding(vertical = MaterialTheme.padding.medium)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(horizontal = MaterialTheme.padding.medium, vertical = MaterialTheme.padding.medium),
+            fontWeight = FontWeight.Bold,
+        )
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = MaterialTheme.padding.medium),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            content()
         }
     }
 }

@@ -17,15 +17,15 @@ import androidx.compose.ui.graphics.Color
 internal object TachiyomiColorScheme : BaseColorScheme() {
 
     override val darkScheme = darkColorScheme(
-        primary = Color(0xFFB0C6FF),
-        onPrimary = Color(0xFF002D6E),
-        primaryContainer = Color(0xFF00429B),
-        onPrimaryContainer = Color(0xFFD9E2FF),
+        primary = Color(0xFFFF4D6D),
+        onPrimary = Color(0xFF680017),
+        primaryContainer = Color(0xFF930020),
+        onPrimaryContainer = Color(0xFFFFDAD9),
         inversePrimary = Color(0xFF0058CA),
-        secondary = Color(0xFFB0C6FF), // Unread badge
-        onSecondary = Color(0xFF002D6E), // Unread badge text
-        secondaryContainer = Color(0xFF00429B), // Navigation bar selector pill & pro
-        onSecondaryContainer = Color(0xFFD9E2FF), // Navigation bar selector icon
+        secondary = Color(0xFF5AC8FA), // Unread badge
+        onSecondary = Color(0xFF003546), // Unread badge text
+        secondaryContainer = Color(0xFF004D66), // Navigation bar selector pill & pro
+        onSecondaryContainer = Color(0xFFCDE5FF), // Navigation bar selector icon
         tertiary = Color(0xFF7ADC77), // Downloaded badge
         onTertiary = Color(0xFF003909), // Downloaded badge text
         tertiaryContainer = Color(0xFF005312),
@@ -53,15 +53,15 @@ internal object TachiyomiColorScheme : BaseColorScheme() {
     )
 
     override val lightScheme = lightColorScheme(
-        primary = Color(0xFF0058CA),
+        primary = Color(0xFFB3001E),
         onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFFD9E2FF),
-        onPrimaryContainer = Color(0xFF001945),
+        primaryContainer = Color(0xFFFFDAD9),
+        onPrimaryContainer = Color(0xFF410004),
         inversePrimary = Color(0xFFB0C6FF),
-        secondary = Color(0xFF0058CA), // Unread badge
+        secondary = Color(0xFF0067AC), // Unread badge
         onSecondary = Color(0xFFFFFFFF), // Unread badge text
-        secondaryContainer = Color(0xFFD9E2FF), // Navigation bar selector pill & progress indicator (remaining)
-        onSecondaryContainer = Color(0xFF001945), // Navigation bar selector icon
+        secondaryContainer = Color(0xFFCDE5FF), // Navigation bar selector pill & progress indicator (remaining)
+        onSecondaryContainer = Color(0xFF001D2F), // Navigation bar selector icon
         tertiary = Color(0xFF006E1B), // Downloaded badge
         onTertiary = Color(0xFFFFFFFF), // Downloaded badge text
         tertiaryContainer = Color(0xFF95F990),

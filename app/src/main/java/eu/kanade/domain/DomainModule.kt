@@ -376,7 +376,7 @@ class DomainModule : InjektModule {
         addFactory { TrustAnimeExtension(get(), get()) }
         addFactory { TrustMangaExtension(get(), get()) }
 
-        addFactory { ExtensionRepoService(get(), get()) }
+        addFactory { ExtensionRepoService(get(), get(), get()) }
 
         addSingletonFactory<AnimeExtensionRepoRepository> { AnimeExtensionRepoRepositoryImpl(get()) }
         addFactory { GetAnimeExtensionRepo(get()) }

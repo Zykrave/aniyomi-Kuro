@@ -19,7 +19,7 @@ class UpdateMangaExtensionRepo(
     }
 
     suspend fun await(repo: ExtensionRepo) {
-        val newRepo = service.fetchRepoDetails(repo.baseUrl) ?: return
+        val newRepo = service.fetchRepoDetails("${repo.baseUrl}/index.min.json") ?: return
         if (
             repo.signingKeyFingerprint.startsWith("NOFINGERPRINT") ||
             repo.signingKeyFingerprint == newRepo.signingKeyFingerprint

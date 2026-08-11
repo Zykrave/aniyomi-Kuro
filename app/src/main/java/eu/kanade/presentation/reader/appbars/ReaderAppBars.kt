@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.components.AppBar
@@ -67,127 +70,127 @@ fun ReaderAppBars(
     onClickSettings: () -> Unit,
 ) {
     val isRtl = viewer is R2LPagerViewer
-    val backgroundColor = MaterialTheme.colorScheme
-        .surfaceColorAtElevation(3.dp)
-        .copy(alpha = if (isSystemInDarkTheme()) 0.9f else 0.95f)
+    val backgroundColor = Color.Black.copy(alpha = 0.6f)
 
-    val modifierWithInsetsPadding = if (fullscreen) {
-        Modifier.systemBarsPadding()
-    } else {
-        Modifier
-    }
-
-    Column(
-        modifier = Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        AnimatedVisibility(
-            visible = visible,
-            enter = slideInVertically(
-                initialOffsetY = { -it },
-                animationSpec = animationSpec,
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { -it },
-                animationSpec = animationSpec,
-            ),
-        ) {
-            AppBar(
-                modifier = modifierWithInsetsPadding
-                    .clickable(onClick = onClickTopAppBar),
-                backgroundColor = backgroundColor,
-                title = mangaTitle,
-                subtitle = chapterTitle,
-                navigateUp = navigateUp,
-                actions = {
-                    AppBarActions(
-                        actions = persistentListOf<AppBar.AppBarAction>().builder()
-                            .apply {
-                                add(
-                                    AppBar.Action(
-                                        title = stringResource(
-                                            if (bookmarked) {
-                                                MR.strings.action_remove_bookmark
-                                            } else {
-                                                MR.strings.action_bookmark
-                                            },
-                                        ),
-                                        icon = if (bookmarked) {
-                                            Icons.Outlined.Bookmark
-                                        } else {
-                                            Icons.Outlined.BookmarkBorder
-                                        },
-                                        onClick = onToggleBookmarked,
-                                    ),
-                                )
-                                onOpenInWebView?.let {
-                                    add(
-                                        AppBar.OverflowAction(
-                                            title = stringResource(MR.strings.action_open_in_web_view),
-                                            onClick = it,
-                                        ),
-                                    )
-                                }
-                                onOpenInBrowser?.let {
-                                    add(
-                                        AppBar.OverflowAction(
-                                            title = stringResource(MR.strings.action_open_in_browser),
-                                            onClick = it,
-                                        ),
-                                    )
-                                }
-                                onShare?.let {
-                                    add(
-                                        AppBar.OverflowAction(
-                                            title = stringResource(MR.strings.action_share),
-                                            onClick = it,
-                                        ),
-                                    )
-                                }
-                            }
-                            .build(),
-                    )
-                },
-            )
+    CompositionLocalProvider(LocalContentColor provides Color.White) {
+        val modifierWithInsetsPadding = if (fullscreen) {
+            Modifier.systemBarsPadding()
+        } else {
+            Modifier
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        AnimatedVisibility(
-            visible = visible,
-            enter = slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = animationSpec,
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = animationSpec,
-            ),
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(
-                modifier = modifierWithInsetsPadding,
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+            AnimatedVisibility(
+                visible = visible,
+                enter = slideInVertically(
+                    initialOffsetY = { -it },
+                    animationSpec = animationSpec,
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { -it },
+                    animationSpec = animationSpec,
+                ),
             ) {
-                ChapterNavigator(
-                    isRtl = isRtl,
-                    onNextChapter = onNextChapter,
-                    enabledNext = enabledNext,
-                    onPreviousChapter = onPreviousChapter,
-                    enabledPrevious = enabledPrevious,
-                    currentPage = currentPage,
-                    totalPages = totalPages,
-                    onPageIndexChange = onPageIndexChange,
-                )
-                BottomReaderBar(
+                AppBar(
+                    modifier = modifierWithInsetsPadding
+                        .clickable(onClick = onClickTopAppBar),
                     backgroundColor = backgroundColor,
-                    readingMode = readingMode,
-                    onClickReadingMode = onClickReadingMode,
-                    orientation = orientation,
-                    onClickOrientation = onClickOrientation,
-                    cropEnabled = cropEnabled,
-                    onClickCropBorder = onClickCropBorder,
-                    onClickSettings = onClickSettings,
+                    title = mangaTitle,
+                    subtitle = chapterTitle,
+                    navigateUp = navigateUp,
+                    actions = {
+                        AppBarActions(
+                            actions = persistentListOf<AppBar.AppBarAction>().builder()
+                                .apply {
+                                    add(
+                                        AppBar.Action(
+                                            title = stringResource(
+                                                if (bookmarked) {
+                                                    MR.strings.action_remove_bookmark
+                                                } else {
+                                                    MR.strings.action_bookmark
+                                                },
+                                            ),
+                                            icon = if (bookmarked) {
+                                                Icons.Outlined.Bookmark
+                                            } else {
+                                                Icons.Outlined.BookmarkBorder
+                                            },
+                                            onClick = onToggleBookmarked,
+                                        ),
+                                    )
+                                    onOpenInWebView?.let {
+                                        add(
+                                            AppBar.OverflowAction(
+                                                title = stringResource(MR.strings.action_open_in_web_view),
+                                                onClick = it,
+                                            ),
+                                        )
+                                    }
+                                    onOpenInBrowser?.let {
+                                        add(
+                                            AppBar.OverflowAction(
+                                                title = stringResource(MR.strings.action_open_in_browser),
+                                                onClick = it,
+                                            ),
+                                        )
+                                    }
+                                    onShare?.let {
+                                        add(
+                                            AppBar.OverflowAction(
+                                                title = stringResource(MR.strings.action_share),
+                                                onClick = it,
+                                            ),
+                                        )
+                                    }
+                                }
+                                .build(),
+                        )
+                    },
                 )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            AnimatedVisibility(
+                visible = visible,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = animationSpec,
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = animationSpec,
+                ),
+            ) {
+                Column(
+                    modifier = modifierWithInsetsPadding,
+                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+                ) {
+                    ChapterNavigator(
+                        isRtl = isRtl,
+                        onNextChapter = onNextChapter,
+                        enabledNext = enabledNext,
+                        onPreviousChapter = onPreviousChapter,
+                        enabledPrevious = enabledPrevious,
+                        currentPage = currentPage,
+                        totalPages = totalPages,
+                        onPageIndexChange = onPageIndexChange,
+                    )
+                    BottomReaderBar(
+                        backgroundColor = backgroundColor,
+                        readingMode = readingMode,
+                        onClickReadingMode = onClickReadingMode,
+                        orientation = orientation,
+                        onClickOrientation = onClickOrientation,
+                        cropEnabled = cropEnabled,
+                        onClickCropBorder = onClickCropBorder,
+                        onClickSettings = onClickSettings,
+                    )
+                }
             }
         }
     }

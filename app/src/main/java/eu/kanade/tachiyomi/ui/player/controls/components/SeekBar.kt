@@ -115,10 +115,10 @@ fun SeekbarWithTimers(
                 },
             modifier = Modifier.weight(1f),
             colors = SeekerDefaults.seekerColors(
-                progressColor = MaterialTheme.colorScheme.primary,
-                thumbColor = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.background,
-                readAheadColor = MaterialTheme.colorScheme.inversePrimary,
+                progressColor = MaterialTheme.colorScheme.secondary,
+                thumbColor = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                readAheadColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
             ),
         )
         VideoTimer(

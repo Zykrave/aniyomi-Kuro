@@ -16,13 +16,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
@@ -40,6 +43,8 @@ import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -64,10 +69,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -89,6 +96,7 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
 import tachiyomi.presentation.core.components.material.TextButton
 import tachiyomi.presentation.core.components.material.padding
+import tachiyomi.presentation.core.components.material.radius
 import tachiyomi.presentation.core.i18n.pluralStringResource
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.clickableNoIndication
@@ -110,10 +118,16 @@ fun AnimeInfoBox(
     doSearch: (query: String, global: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        // Backdrop
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(if (isTabletUi) 440.dp else 340.dp),
+    ) {
+        // Backdrop (Banner)
         val backdropGradientColors = listOf(
             Color.Transparent,
+            MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
+            MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
             MaterialTheme.colorScheme.background,
         )
         AsyncImage(
@@ -125,37 +139,42 @@ fun AnimeInfoBox(
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .matchParentSize()
+                .fillMaxSize()
                 .drawWithContent {
                     drawContent()
                     drawRect(
                         brush = Brush.verticalGradient(colors = backdropGradientColors),
                     )
-                }
-                .blur(4.dp)
-                .alpha(0.2f),
+                },
         )
 
         // Anime & source info
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-            if (!isTabletUi) {
-                AnimeAndSourceTitlesSmall(
-                    appBarPadding = appBarPadding,
-                    anime = anime,
-                    sourceName = sourceName,
-                    isStubSource = isStubSource,
-                    onCoverClick = onCoverClick,
-                    doSearch = doSearch,
-                )
-            } else {
-                AnimeAndSourceTitlesLarge(
-                    appBarPadding = appBarPadding,
-                    anime = anime,
-                    sourceName = sourceName,
-                    isStubSource = isStubSource,
-                    onCoverClick = onCoverClick,
-                    doSearch = doSearch,
-                )
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+        ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                if (!isTabletUi) {
+                    AnimeAndSourceTitlesSmall(
+                        appBarPadding = appBarPadding,
+                        anime = anime,
+                        sourceName = sourceName,
+                        isStubSource = isStubSource,
+                        onCoverClick = onCoverClick,
+                        doSearch = doSearch,
+                    )
+                } else {
+                    AnimeAndSourceTitlesLarge(
+                        appBarPadding = appBarPadding,
+                        anime = anime,
+                        sourceName = sourceName,
+                        isStubSource = isStubSource,
+                        onCoverClick = onCoverClick,
+                        doSearch = doSearch,
+                    )
+                }
             }
         }
     }
@@ -187,18 +206,44 @@ fun AnimeActionRow(
         }
     }
 
-    Row(modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
-        AnimeActionButton(
-            title = if (favorite) {
-                stringResource(MR.strings.in_library)
-            } else {
-                stringResource(MR.strings.add_to_library)
-            },
-            icon = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            color = if (favorite) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
-            onClick = onAddToLibraryClicked,
-            onLongClick = onEditCategory,
-        )
+    Row(modifier = modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
+        val primaryButtonColor = MaterialTheme.colorScheme.primary
+        val onPrimaryButtonColor = MaterialTheme.colorScheme.onPrimary
+
+        if (!favorite) {
+            Button(
+                onClick = onAddToLibraryClicked,
+                modifier = Modifier
+                    .weight(2f)
+                    .height(48.dp)
+                    .padding(end = 8.dp),
+                shape = RoundedCornerShape(MaterialTheme.radius.large),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = primaryButtonColor,
+                    contentColor = onPrimaryButtonColor,
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.FavoriteBorder,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(MR.strings.add_to_library),
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        } else {
+            AnimeActionButton(
+                title = stringResource(MR.strings.in_library),
+                icon = Icons.Filled.Favorite,
+                color = primaryButtonColor,
+                onClick = onAddToLibraryClicked,
+                onLongClick = onEditCategory,
+            )
+        }
+
         AnimeActionButton(
             title = when (nextUpdateDays) {
                 null -> stringResource(MR.strings.not_applicable)
@@ -265,7 +310,7 @@ fun ExpandableAnimeDescription(
             shrunkDescription = trimmedDescription,
             expanded = expanded,
             modifier = Modifier
-                .padding(top = 8.dp)
+                .padding(top = 16.dp)
                 .padding(horizontal = 16.dp)
                 .clickableNoIndication { onExpanded(!expanded) },
         )
@@ -349,16 +394,17 @@ private fun AnimeAndSourceTitlesLarge(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, top = appBarPadding + 16.dp, end = 16.dp),
+            .padding(start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ItemCover.Book(
-            modifier = Modifier.fillMaxWidth(0.65f),
+            modifier = Modifier.height(200.dp),
             data = ImageRequest.Builder(LocalContext.current)
                 .data(anime)
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(MR.strings.manga_cover),
+            shape = RoundedCornerShape(MaterialTheme.radius.large),
             onClick = onCoverClick,
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -387,23 +433,25 @@ private fun AnimeAndSourceTitlesSmall(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, top = appBarPadding + 16.dp, end = 16.dp),
+            .padding(start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Bottom,
     ) {
         ItemCover.Book(
             modifier = Modifier
-                .sizeIn(maxWidth = 100.dp)
-                .align(Alignment.Top),
+                .width(100.dp)
+                .height(150.dp),
             data = ImageRequest.Builder(LocalContext.current)
                 .data(anime)
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(MR.strings.manga_cover),
+            shape = RoundedCornerShape(MaterialTheme.radius.large),
             onClick = onCoverClick,
         )
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.weight(1f),
         ) {
             AnimeContentInfo(
                 title = anime.title,
@@ -432,7 +480,10 @@ private fun ColumnScope.AnimeContentInfo(
     val context = LocalContext.current
     Text(
         text = title.ifBlank { stringResource(MR.strings.unknown_title) },
-        style = MaterialTheme.typography.titleLarge,
+        style = MaterialTheme.typography.headlineSmall.copy(
+            shadow = Shadow(color = Color.Black, blurRadius = 4f),
+        ),
+        fontWeight = FontWeight.Bold,
         modifier = Modifier.clickableNoIndication(
             onLongClick = {
                 if (title.isNotBlank()) {
@@ -447,7 +498,11 @@ private fun ColumnScope.AnimeContentInfo(
         textAlign = textAlign,
     )
 
-    Spacer(modifier = Modifier.height(2.dp))
+    Spacer(modifier = Modifier.height(4.dp))
+
+    val infoStyle = MaterialTheme.typography.bodyMedium.copy(
+        shadow = Shadow(color = Color.Black, blurRadius = 2f),
+    )
 
     Row(
         modifier = Modifier.secondaryItemAlpha(),
@@ -462,7 +517,7 @@ private fun ColumnScope.AnimeContentInfo(
         Text(
             text = author?.takeIf { it.isNotBlank() }
                 ?: stringResource(MR.strings.unknown_author),
-            style = MaterialTheme.typography.titleSmall,
+            style = infoStyle,
             modifier = Modifier
                 .clickableNoIndication(
                     onLongClick = {
@@ -478,32 +533,6 @@ private fun ColumnScope.AnimeContentInfo(
             textAlign = textAlign,
         )
     }
-
-    if (!artist.isNullOrBlank() && author != artist) {
-        Row(
-            modifier = Modifier.secondaryItemAlpha(),
-            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Brush,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-            )
-            Text(
-                text = artist,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier
-                    .clickableNoIndication(
-                        onLongClick = { context.copyToClipboard(artist, artist) },
-                        onClick = { doSearch(artist, true) },
-                    ),
-                textAlign = textAlign,
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.height(2.dp))
 
     Row(
         modifier = Modifier.secondaryItemAlpha(),
@@ -524,7 +553,7 @@ private fun ColumnScope.AnimeContentInfo(
                 .padding(end = 4.dp)
                 .size(16.dp),
         )
-        ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+        ProvideTextStyle(infoStyle) {
             Text(
                 text = when (status) {
                     SAnime.ONGOING.toLong() -> stringResource(MR.strings.ongoing)
@@ -539,16 +568,6 @@ private fun ColumnScope.AnimeContentInfo(
                 maxLines = 1,
             )
             DotSeparatorText()
-            if (isStubSource) {
-                Icon(
-                    imageVector = Icons.Filled.Warning,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .size(16.dp),
-                    tint = MaterialTheme.colorScheme.error,
-                )
-            }
             Text(
                 text = sourceName,
                 modifier = Modifier.clickableNoIndication {
@@ -577,7 +596,7 @@ private fun AnimeSummary(
         contents = listOf(
             {
                 Text(
-                    text = "\n\n", // Shows at least 3 lines
+                    text = "\n\n\n\n", // Shows at least 4 lines
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -591,7 +610,7 @@ private fun AnimeSummary(
                 SelectionContainer {
                     Text(
                         text = if (expanded) expandedDescription else shrunkDescription,
-                        maxLines = Int.MAX_VALUE,
+                        maxLines = if (expanded) Int.MAX_VALUE else 4,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.secondaryItemAlpha(),
@@ -601,17 +620,19 @@ private fun AnimeSummary(
             {
                 val colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background)
                 Box(
-                    modifier = Modifier.background(Brush.verticalGradient(colors = colors)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Brush.verticalGradient(colors = colors))
+                        .padding(top = 8.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    val image = AnimatedImageVector.animatedVectorResource(R.drawable.anim_caret_down)
-                    Icon(
-                        painter = rememberAnimatedVectorPainter(image, !expanded),
-                        contentDescription = stringResource(
+                    Text(
+                        text = stringResource(
                             if (expanded) MR.strings.manga_info_collapse else MR.strings.manga_info_expand,
-                        ),
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.background(Brush.radialGradient(colors = colors.asReversed())),
+                        ).uppercase(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             },
@@ -624,7 +645,7 @@ private fun AnimeSummary(
             .measure(constraints)
             .height
         val heightDelta = expandedHeight - shrunkHeight
-        val scrimHeight = 24.dp.roundToPx()
+        val scrimHeight = 32.dp.roundToPx()
 
         val actualPlaceable = actual.single()
             .measure(constraints)

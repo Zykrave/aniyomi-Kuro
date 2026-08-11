@@ -6,17 +6,23 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,10 +31,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.HazeTint
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -36,6 +52,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import eu.kanade.domain.source.service.SourcePreferences
 import eu.kanade.domain.ui.UiPreferences
+import eu.kanade.presentation.components.LocalHazeState
 import eu.kanade.presentation.util.Screen
 import eu.kanade.presentation.util.isTabletUi
 import eu.kanade.tachiyomi.ui.browse.BrowseTab
@@ -59,6 +76,7 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.NavigationBar
 import tachiyomi.presentation.core.components.material.NavigationRail
 import tachiyomi.presentation.core.components.material.Scaffold
+import tachiyomi.presentation.core.components.material.elevation
 import tachiyomi.presentation.core.i18n.pluralStringResource
 import tachiyomi.presentation.core.util.collectAsState
 import uy.kohesive.injekt.Injekt
@@ -82,6 +100,7 @@ object HomeScreen : Screen() {
     override fun Content() {
         val navStyle by uiPreferences.navStyle().collectAsState()
         val navigator = LocalNavigator.currentOrThrow
+        val hazeState = LocalHazeState.current
         TabNavigator(
             tab = defaultTab,
             key = TAB_NAVIGATOR_KEY,
@@ -108,9 +127,32 @@ object HomeScreen : Screen() {
                                 enter = expandVertically(),
                                 exit = shrinkVertically(),
                             ) {
-                                NavigationBar {
-                                    navStyle.tabs.fastForEach {
-                                        NavigationBarItem(it)
+                                Box(
+                                    modifier = Modifier
+                                        .navigationBarsPadding()
+                                        .padding(bottom = 12.dp, start = 16.dp, end = 16.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    NavigationBar(
+                                        modifier = Modifier
+                                            .shadow(MaterialTheme.elevation.level4, CircleShape)
+                                            .clip(CircleShape)
+                                            .then(
+                                                hazeState?.let {
+                                                    Modifier.hazeEffect(
+                                                        state = it,
+                                                        style = HazeStyle(
+                                                            blurRadius = 20.dp,
+                                                            tint = HazeTint(Color.Black.copy(alpha = 0.4f)),
+                                                        ),
+                                                    )
+                                                } ?: Modifier,
+                                            ),
+                                        containerColor = Color.Transparent,
+                                    ) {
+                                        navStyle.tabs.fastForEach {
+                                            NavigationBarItem(it)
+                                        }
                                     }
                                 }
                             }
@@ -120,6 +162,8 @@ object HomeScreen : Screen() {
                 ) { contentPadding ->
                     Box(
                         modifier = Modifier
+                            .fillMaxSize()
+                            .then(hazeState?.let { Modifier.hazeSource(state = it) } ?: Modifier)
                             .padding(contentPadding)
                             .consumeWindowInsets(contentPadding),
                     ) {
@@ -216,7 +260,21 @@ object HomeScreen : Screen() {
                     scope.launch { tab.onReselect(navigator) }
                 }
             },
-            icon = { NavigationIconItem(tab) },
+            icon = {
+                Box(contentAlignment = Alignment.Center) {
+                    if (selected) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                    CircleShape,
+                                ),
+                        )
+                    }
+                    NavigationIconItem(tab)
+                }
+            },
             label = {
                 Text(
                     text = tab.options.title,
@@ -225,7 +283,13 @@ object HomeScreen : Screen() {
                     overflow = TextOverflow.Ellipsis,
                 )
             },
-            alwaysShowLabel = true,
+            alwaysShowLabel = false,
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                indicatorColor = Color.Transparent,
+            ),
         )
     }
 

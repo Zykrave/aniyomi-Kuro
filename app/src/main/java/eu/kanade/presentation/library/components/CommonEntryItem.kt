@@ -1,7 +1,17 @@
 package eu.kanade.presentation.library.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -13,26 +23,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,6 +61,8 @@ import androidx.compose.ui.unit.sp
 import eu.kanade.presentation.entries.components.ItemCover
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.BadgeGroup
+import tachiyomi.presentation.core.components.material.elevation
+import tachiyomi.presentation.core.components.material.radius
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.selectedBackground
 import tachiyomi.domain.entries.EntryCover as EntryCoverModel
@@ -273,17 +294,249 @@ private fun GridItemTitle(
     minLines: Int,
     modifier: Modifier = Modifier,
     maxLines: Int = 2,
+    compact: Boolean = false,
 ) {
     Text(
         modifier = modifier,
         text = title,
-        fontSize = 12.sp,
-        lineHeight = 18.sp,
+        fontSize = if (compact) 10.sp else 12.sp,
+        lineHeight = if (compact) 14.sp else 18.sp,
         minLines = minLines,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         style = style,
     )
+}
+
+/**
+ * Library-specific grid item with title overlaying the cover.
+ */
+@Composable
+fun LibraryCompactGridItem(
+    coverData: EntryCoverModel,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
+    title: String? = null,
+    progress: Float = 0f,
+    onClickContinueViewing: (() -> Unit)? = null,
+    coverBadgeStart: @Composable (RowScope.() -> Unit)? = null,
+    coverBadgeEnd: @Composable (RowScope.() -> Unit)? = null,
+) {
+    LibraryGridItemSelectable(
+        isSelected = isSelected,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        modifier = modifier,
+    ) {
+        LibraryGridCover(
+            cover = {
+                ItemCover.Book(
+                    modifier = Modifier.fillMaxWidth(),
+                    data = coverData,
+                    shape = RoundedCornerShape(16.dp),
+                )
+            },
+            progress = progress,
+            badgesStart = coverBadgeStart,
+            badgesEnd = coverBadgeEnd,
+            content = {
+                if (title != null) {
+                    CoverTextOverlay(
+                        title = title,
+                        onClickContinueViewing = onClickContinueViewing,
+                    )
+                } else if (onClickContinueViewing != null) {
+                    ContinueViewingButton(
+                        size = ContinueViewingButtonSizeLarge,
+                        iconSize = ContinueViewingButtonIconSizeLarge,
+                        onClick = onClickContinueViewing,
+                        modifier = Modifier
+                            .padding(ContinueViewingButtonGridPadding)
+                            .align(Alignment.BottomEnd),
+                    )
+                }
+            },
+        )
+    }
+}
+
+/**
+ * Library-specific grid item with title below the cover.
+ */
+@Composable
+fun LibraryComfortableGridItem(
+    isSelected: Boolean = false,
+    title: String,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    coverData: EntryCoverModel,
+    modifier: Modifier = Modifier,
+    progress: Float = 0f,
+    coverBadgeStart: (@Composable RowScope.() -> Unit)? = null,
+    coverBadgeEnd: (@Composable RowScope.() -> Unit)? = null,
+    onClickContinueViewing: (() -> Unit)? = null,
+    compact: Boolean = false,
+) {
+    LibraryGridItemSelectable(
+        isSelected = isSelected,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        modifier = modifier,
+        compact = compact,
+    ) {
+        Column {
+            LibraryGridCover(
+                cover = {
+                    ItemCover.Book(
+                        modifier = Modifier.fillMaxWidth(),
+                        data = coverData,
+                        shape = RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large),
+                    )
+                },
+                progress = progress,
+                badgesStart = coverBadgeStart,
+                badgesEnd = coverBadgeEnd,
+                compact = compact,
+                content = {
+                    if (onClickContinueViewing != null) {
+                        ContinueViewingButton(
+                            size = ContinueViewingButtonSizeLarge,
+                            iconSize = ContinueViewingButtonIconSizeLarge,
+                            onClick = onClickContinueViewing,
+                            modifier = Modifier
+                                .padding(ContinueViewingButtonGridPadding)
+                                .align(Alignment.BottomEnd),
+                        )
+                    }
+                },
+            )
+            GridItemTitle(
+                modifier = Modifier.padding(4.dp),
+                title = title,
+                style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
+                minLines = if (compact) 1 else 2,
+                maxLines = if (compact) 1 else 2,
+                compact = compact,
+            )
+        }
+    }
+}
+
+@Composable
+private fun LibraryGridItemSelectable(
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    compact: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium,
+        ),
+        label = "cardPressScale",
+    )
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(animationSpec = tween(300)) +
+            slideInVertically(animationSpec = tween(300), initialOffsetY = { it / 4 }),
+        exit = ExitTransition.None,
+    ) {
+        Box(
+            modifier = modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }
+                .then(if (compact) Modifier.width(90.dp) else Modifier)
+                .shadow(
+                    elevation = if (compact) 1.dp else MaterialTheme.elevation.level2,
+                    shape = RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large),
+                )
+                .clip(RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large))
+                .background(MaterialTheme.colorScheme.surface)
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                )
+                .selectedOutline(isSelected = isSelected, color = MaterialTheme.colorScheme.secondary),
+        ) {
+            val contentColor = if (isSelected) {
+                MaterialTheme.colorScheme.onSecondary
+            } else {
+                LocalContentColor.current
+            }
+            CompositionLocalProvider(LocalContentColor provides contentColor) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+private fun LibraryGridCover(
+    modifier: Modifier = Modifier,
+    cover: @Composable BoxScope.() -> Unit = {},
+    progress: Float = 0f,
+    badgesStart: (@Composable RowScope.() -> Unit)? = null,
+    badgesEnd: (@Composable RowScope.() -> Unit)? = null,
+    compact: Boolean = false,
+    content: @Composable (BoxScope.() -> Unit)? = null,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(ItemCover.Book.ratio),
+    ) {
+        cover()
+        if (progress > 0f) {
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .align(Alignment.BottomCenter)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomStart = if (compact) 10.dp else MaterialTheme.radius.large,
+                            bottomEnd = if (compact) 10.dp else MaterialTheme.radius.large,
+                        ),
+                    ),
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = Color.Transparent,
+            )
+        }
+        content?.invoke(this)
+        if (badgesStart != null) {
+            BadgeGroup(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .align(Alignment.TopStart),
+                content = badgesStart,
+            )
+        }
+
+        if (badgesEnd != null) {
+            BadgeGroup(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .align(Alignment.TopEnd),
+                content = badgesEnd,
+            )
+        }
+    }
 }
 
 /**

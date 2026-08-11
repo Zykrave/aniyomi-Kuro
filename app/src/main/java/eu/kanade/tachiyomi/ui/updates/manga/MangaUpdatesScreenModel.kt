@@ -56,6 +56,7 @@ class MangaUpdatesScreenModel(
     private val getUpdates: GetMangaUpdates = Injekt.get(),
     private val getManga: GetManga = Injekt.get(),
     private val getChapter: GetChapter = Injekt.get(),
+    private val getLibraryManga: tachiyomi.domain.entries.manga.interactor.GetLibraryManga = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) : StateScreenModel<MangaUpdatesScreenModel.State>(State()) {
@@ -90,6 +91,16 @@ class MangaUpdatesScreenModel(
                             items = updates.toUpdateItems(),
                         )
                     }
+                }
+        }
+
+        screenModelScope.launchIO {
+            getLibraryManga.subscribe()
+                .collectLatest { library ->
+                    val continueReading = library
+                        .filter { it.hasStarted && it.readCount < it.totalChapters }
+                        .sortedByDescending { it.lastRead }
+                    mutableState.update { it.copy(continueReading = continueReading) }
                 }
         }
 
@@ -364,6 +375,7 @@ class MangaUpdatesScreenModel(
     data class State(
         val isLoading: Boolean = true,
         val items: PersistentList<MangaUpdatesItem> = persistentListOf(),
+        val continueReading: List<tachiyomi.domain.library.manga.LibraryManga> = emptyList(),
         val dialog: Dialog? = null,
     ) {
         val selected = items.filter { it.selected }

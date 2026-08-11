@@ -286,6 +286,7 @@ dependencies {
     implementation(libs.compose.webview)
     implementation(libs.compose.grid)
     implementation(libs.reorderable)
+    implementation(libs.haze)
 
     // Logging
     implementation(libs.logcat)

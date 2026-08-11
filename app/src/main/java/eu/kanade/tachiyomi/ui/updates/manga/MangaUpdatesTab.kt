@@ -63,7 +63,7 @@ fun Screen.mangaUpdatesTab(
                 state = state,
                 snackbarHostState = screenModel.snackbarHostState,
                 lastUpdated = screenModel.lastUpdated,
-                onClickCover = { item -> navigator.push(MangaScreen(item.update.mangaId)) },
+                onClickCover = { mangaId -> navigator.push(MangaScreen(mangaId)) },
                 onSelectAll = screenModel::toggleAllSelection,
                 onInvertSelection = screenModel::invertSelection,
                 onUpdateLibrary = screenModel::updateLibrary,

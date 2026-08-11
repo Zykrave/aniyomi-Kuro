@@ -1,7 +1,12 @@
 package eu.kanade.presentation.library.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
@@ -28,13 +33,24 @@ internal fun LibraryTabs(
         PrimaryScrollableTabRow(
             selectedTabIndex = currentPageIndex,
             edgePadding = 0.dp,
-            // TODO: use default when width is fixed upstream
-            // https://issuetracker.google.com/issues/242879624
             divider = {},
+            indicator = {
+                Box(
+                    Modifier
+                        .tabIndicatorOffset(currentPageIndex, matchContentSize = false)
+                        .fillMaxHeight()
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape,
+                        ),
+                )
+            },
         ) {
             categories.forEachIndexed { index, category ->
+                val selected = currentPageIndex == index
                 Tab(
-                    selected = currentPageIndex == index,
+                    selected = selected,
                     onClick = { onTabItemClick(index) },
                     text = {
                         TabText(
@@ -42,6 +58,7 @@ internal fun LibraryTabs(
                             badgeCount = getNumberOfItemsForCategory(category),
                         )
                     },
+                    selectedContentColor = MaterialTheme.colorScheme.onPrimary,
                     unselectedContentColor = MaterialTheme.colorScheme.onSurface,
                 )
             }

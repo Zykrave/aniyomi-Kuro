@@ -26,3 +26,25 @@ class Padding {
 
 val MaterialTheme.padding: Padding
     get() = Padding()
+
+class Radius {
+    val extraLarge = 24.dp
+    val large = 16.dp
+    val medium = 14.dp
+    val small = 8.dp
+    val extraSmall = 6.dp
+}
+
+val MaterialTheme.radius: Radius
+    get() = Radius()
+
+class Elevation {
+    val level0 = 0.dp
+    val level1 = 1.dp
+    val level2 = 2.dp
+    val level3 = 4.dp
+    val level4 = 8.dp
+}
+
+val MaterialTheme.elevation: Elevation
+    get() = Elevation()

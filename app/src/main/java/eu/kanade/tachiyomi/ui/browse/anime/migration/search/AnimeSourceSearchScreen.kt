@@ -19,7 +19,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import eu.kanade.core.util.ifAnimeSourcesLoaded
 import eu.kanade.presentation.browse.anime.BrowseAnimeSourceContent
-import eu.kanade.presentation.components.SearchToolbar
+import eu.kanade.presentation.components.PillSearchToolbar
 import eu.kanade.presentation.util.Screen
 import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
 import eu.kanade.tachiyomi.core.common.Constants
@@ -62,13 +62,12 @@ data class AnimeSourceSearchScreen(
         val snackbarHostState = remember { SnackbarHostState() }
 
         Scaffold(
-            topBar = { scrollBehavior ->
-                SearchToolbar(
-                    searchQuery = state.toolbarQuery ?: "",
+            topBar = {
+                PillSearchToolbar(
+                    searchQuery = state.toolbarQuery,
                     onChangeSearchQuery = screenModel::setToolbarQuery,
-                    onClickCloseSearch = navigator::pop,
+                    navigateUp = navigator::pop,
                     onSearch = screenModel::search,
-                    scrollBehavior = scrollBehavior,
                 )
             },
             floatingActionButton = {

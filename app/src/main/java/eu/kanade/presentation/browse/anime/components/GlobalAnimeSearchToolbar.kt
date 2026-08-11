@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.FilterList
@@ -26,7 +28,9 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import eu.kanade.presentation.components.SearchToolbar
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import eu.kanade.presentation.components.PillSearchToolbar
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.AnimeSourceFilter
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding
@@ -48,20 +52,21 @@ fun GlobalAnimeSearchToolbar(
 ) {
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
         Box {
-            SearchToolbar(
+            PillSearchToolbar(
                 searchQuery = searchQuery,
                 onChangeSearchQuery = onChangeSearchQuery,
                 onSearch = onSearch,
-                onClickCloseSearch = navigateUp,
                 navigateUp = navigateUp,
-                scrollBehavior = scrollBehavior,
             )
             if (progress in 1..<total) {
                 LinearProgressIndicator(
                     progress = { progress / total.toFloat() },
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = Color.Transparent,
                 )
             }
         }
@@ -69,13 +74,14 @@ fun GlobalAnimeSearchToolbar(
         Row(
             modifier = Modifier
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = MaterialTheme.padding.small),
+                .padding(horizontal = MaterialTheme.padding.small, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // TODO: make this UX better; it only applies when triggering a new search
             FilterChip(
                 selected = sourceFilter == AnimeSourceFilter.PinnedOnly,
                 onClick = { onChangeSearchFilter(AnimeSourceFilter.PinnedOnly) },
+                shape = CircleShape,
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.PushPin,
@@ -87,10 +93,17 @@ fun GlobalAnimeSearchToolbar(
                 label = {
                     Text(text = stringResource(MR.strings.pinned_sources))
                 },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+                border = null,
             )
             FilterChip(
                 selected = sourceFilter == AnimeSourceFilter.All,
                 onClick = { onChangeSearchFilter(AnimeSourceFilter.All) },
+                shape = CircleShape,
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.DoneAll,
@@ -102,13 +115,20 @@ fun GlobalAnimeSearchToolbar(
                 label = {
                     Text(text = stringResource(MR.strings.all))
                 },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+                border = null,
             )
 
-            VerticalDivider()
+            VerticalDivider(modifier = Modifier.height(24.dp))
 
             FilterChip(
                 selected = onlyShowHasResults,
                 onClick = { onToggleResults() },
+                shape = CircleShape,
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.FilterList,
@@ -120,6 +140,12 @@ fun GlobalAnimeSearchToolbar(
                 label = {
                     Text(text = stringResource(MR.strings.has_results))
                 },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+                border = null,
             )
         }
 
