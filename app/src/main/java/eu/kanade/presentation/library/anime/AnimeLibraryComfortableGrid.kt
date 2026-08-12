@@ -44,6 +44,7 @@ internal fun AnimeLibraryComfortableGrid(
             LibraryComfortableGridItem(
                 isSelected = selection.fastAny { it.id == libraryItem.libraryAnime.id },
                 title = anime.title,
+                subtitle = "${libraryItem.libraryAnime.totalCount} Episodes",
                 progress = if (libraryItem.libraryAnime.totalCount > 0) {
                     libraryItem.libraryAnime.seenCount.toFloat() / libraryItem.libraryAnime.totalCount
                 } else {

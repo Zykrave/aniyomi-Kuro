@@ -44,6 +44,7 @@ internal fun MangaLibraryComfortableGrid(
             LibraryComfortableGridItem(
                 isSelected = selection.fastAny { it.id == libraryItem.libraryManga.id },
                 title = manga.title,
+                subtitle = "${libraryItem.libraryManga.totalChapters} Chapters",
                 progress = if (libraryItem.libraryManga.totalChapters > 0) {
                     libraryItem.libraryManga.readCount.toFloat() / libraryItem.libraryManga.totalChapters
                 } else {

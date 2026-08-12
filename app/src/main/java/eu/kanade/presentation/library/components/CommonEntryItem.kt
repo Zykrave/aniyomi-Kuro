@@ -370,6 +370,7 @@ fun LibraryCompactGridItem(
 fun LibraryComfortableGridItem(
     isSelected: Boolean = false,
     title: String,
+    subtitle: String? = null,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     coverData: EntryCoverModel,
@@ -414,13 +415,23 @@ fun LibraryComfortableGridItem(
                 },
             )
             GridItemTitle(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = if (compact) 4.dp else 0.dp),
                 title = title,
                 style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
                 minLines = if (compact) 1 else 2,
                 maxLines = if (compact) 1 else 2,
                 compact = compact,
             )
+            if (subtitle != null && !compact) {
+                Text(
+                    text = subtitle,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
