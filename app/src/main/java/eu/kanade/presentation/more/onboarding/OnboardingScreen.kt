@@ -34,6 +34,7 @@ fun OnboardingScreen(
     var currentStep by rememberSaveable { mutableIntStateOf(0) }
     val steps = remember {
         listOf(
+            WelcomeDisclaimerStep(),
             StorageStep(),
             PermissionStep(),
             GuidesStep(onRestoreBackup = onRestoreBackup),

@@ -9,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -465,6 +466,11 @@ private fun LibraryGridItemSelectable(
                 )
                 .clip(RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large))
                 .background(MaterialTheme.colorScheme.surface)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large),
+                )
                 .combinedClickable(
                     interactionSource = interactionSource,
                     indication = null,
