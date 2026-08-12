@@ -7,6 +7,7 @@ import androidx.compose.animation.core.StartOffsetType
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import eu.kanade.presentation.more.settings.LocalPreferenceHighlighted
 import eu.kanade.presentation.more.settings.LocalPreferenceMinHeight
 import kotlinx.coroutines.delay
+import tachiyomi.presentation.core.components.material.radius
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -48,10 +55,17 @@ internal fun BasePreferenceWidget(
     val minHeight = LocalPreferenceMinHeight.current
     Row(
         modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(MaterialTheme.radius.medium))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(MaterialTheme.radius.medium),
+            )
             .highlightBackground(highlighted)
             .sizeIn(minHeight = minHeight)
-            .clickable(enabled = onClick != null, onClick = { onClick?.invoke() })
-            .fillMaxWidth(),
+            .clickable(enabled = onClick != null, onClick = { onClick?.invoke() }),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -81,6 +95,17 @@ internal fun BasePreferenceWidget(
             Box(
                 modifier = Modifier.padding(end = PrefsHorizontalPadding),
                 content = { widget() },
+            )
+        } else if (onClick != null) {
+            Box(
+                modifier = Modifier.padding(end = PrefsHorizontalPadding),
+                content = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
             )
         }
     }
