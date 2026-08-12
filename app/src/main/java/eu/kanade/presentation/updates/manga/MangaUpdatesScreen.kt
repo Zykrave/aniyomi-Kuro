@@ -114,96 +114,14 @@ fun MangaUpdateScreen(
                     ) {
                         mangaUpdatesLastUpdatedItem(lastUpdated)
 
-                        item(key = "home-continue-reading") {
-                            HomeShelf(title = stringResource(AYMR.strings.currently_reading)) {
-                                if (state.continueReading.isNotEmpty()) {
-                                    items(
-                                        items = state.continueReading,
-                                        key = { "continue-reading-${it.id}" },
-                                    ) { item ->
-                                        LibraryComfortableGridItem(
-                                            modifier = Modifier.width(if (homeCardStyle == HomeCardStyle.COMPACT) 90.dp else 128.dp),
-                                            title = item.manga.title,
-                                            coverData = item.manga.asMangaCover(),
-                                            progress = if (item.totalChapters > 0) {
-                                                item.readCount.toFloat() / item.totalChapters
-                                            } else {
-                                                0f
-                                            },
-                                            onClick = { onClickCover(item.manga.id) },
-                                            onLongClick = { /* Handle long click if needed */ },
-                                            compact = homeCardStyle == HomeCardStyle.COMPACT,
-                                        )
-                                    }
-                                } else {
-                                    item {
-                                        Text(
-                                            text = stringResource(MR.strings.information_no_recent),
-                                            modifier = Modifier.padding(MaterialTheme.padding.small),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        item(key = "home-recently-updated") {
-                            val recentlyUpdated = state.items
-                                .distinctBy { it.update.mangaId }
-                                .take(20)
-                            HomeShelf(title = stringResource(MR.strings.label_recent_updates)) {
-                                if (recentlyUpdated.isNotEmpty()) {
-                                    items(
-                                        items = recentlyUpdated,
-                                        key = { "recently-updated-${it.update.mangaId}" },
-                                    ) { item ->
-                                        LibraryComfortableGridItem(
-                                            modifier = Modifier.width(128.dp),
-                                            title = item.update.mangaTitle,
-                                            coverData = item.update.coverData,
-                                            onClick = { onClickCover(item.update.mangaId) },
-                                            onLongClick = { /* Handle long click if needed */ },
-                                        )
-                                    }
-                                } else {
-                                    item {
-                                        Text(
-                                            text = stringResource(MR.strings.information_no_recent),
-                                            modifier = Modifier.padding(MaterialTheme.padding.small),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        item(key = "home-new-chapters") {
-                            val newChapters = state.items.take(20)
-                            HomeShelf(title = stringResource(AYMR.strings.chapters_episodes)) {
-                                if (newChapters.isNotEmpty()) {
-                                    items(
-                                        items = newChapters,
-                                        key = { "new-chapters-${it.update.chapterId}" },
-                                    ) { item ->
-                                        LibraryComfortableGridItem(
-                                            modifier = Modifier.width(128.dp),
-                                            title = "${item.update.mangaTitle} - ${item.update.chapterName}",
-                                            coverData = item.update.coverData,
-                                            onClick = { onOpenChapter(item) },
-                                            onLongClick = { onUpdateSelected(item, !item.selected, true, true) },
-                                        )
-                                    }
-                                } else {
-                                    item {
-                                        Text(
-                                            text = stringResource(MR.strings.information_no_recent),
-                                            modifier = Modifier.padding(MaterialTheme.padding.small),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                        mangaUpdatesUiItems(
+                            uiModels = state.getUiModel(),
+                            selectionMode = state.selectionMode,
+                            onUpdateSelected = onUpdateSelected,
+                            onClickCover = { item -> onClickCover(item.update.mangaId) },
+                            onClickUpdate = onOpenChapter,
+                            onDownloadChapter = onDownloadChapter,
+                        )
                     }
                 }
             }

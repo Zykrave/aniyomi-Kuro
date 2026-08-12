@@ -118,96 +118,14 @@ fun AnimeUpdateScreen(
                     ) {
                         animeUpdatesLastUpdatedItem(lastUpdated)
 
-                        item(key = "home-continue-watching") {
-                            HomeShelf(title = stringResource(AYMR.strings.currently_watching)) {
-                                if (state.continueWatching.isNotEmpty()) {
-                                    items(
-                                        items = state.continueWatching,
-                                        key = { "continue-watching-${it.id}" },
-                                    ) { item ->
-                                        LibraryComfortableGridItem(
-                                            modifier = Modifier.width(if (homeCardStyle == HomeCardStyle.COMPACT) 90.dp else 128.dp),
-                                            title = item.anime.title,
-                                            coverData = item.anime.asAnimeCover(),
-                                            progress = if (item.totalCount > 0) {
-                                                item.seenCount.toFloat() / item.totalCount
-                                            } else {
-                                                0f
-                                            },
-                                            onClick = { onClickCover(item.anime.id) },
-                                            onLongClick = { /* Handle long click if needed */ },
-                                            compact = homeCardStyle == HomeCardStyle.COMPACT,
-                                        )
-                                    }
-                                } else {
-                                    item {
-                                        Text(
-                                            text = stringResource(MR.strings.information_no_recent),
-                                            modifier = Modifier.padding(MaterialTheme.padding.small),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        item(key = "home-recently-updated") {
-                            val recentlyUpdated = state.items
-                                .distinctBy { it.update.animeId }
-                                .take(20)
-                            HomeShelf(title = stringResource(AYMR.strings.label_anime_updates)) {
-                                if (recentlyUpdated.isNotEmpty()) {
-                                    items(
-                                        items = recentlyUpdated,
-                                        key = { "recently-updated-${it.update.animeId}" },
-                                    ) { item ->
-                                        LibraryComfortableGridItem(
-                                            modifier = Modifier.width(128.dp),
-                                            title = item.update.animeTitle,
-                                            coverData = item.update.coverData,
-                                            onClick = { onClickCover(item.update.animeId) },
-                                            onLongClick = { /* Handle long click if needed */ },
-                                        )
-                                    }
-                                } else {
-                                    item {
-                                        Text(
-                                            text = stringResource(MR.strings.information_no_recent),
-                                            modifier = Modifier.padding(MaterialTheme.padding.small),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        item(key = "home-new-episodes") {
-                            val newEpisodes = state.items.take(20)
-                            HomeShelf(title = stringResource(AYMR.strings.episodes)) {
-                                if (newEpisodes.isNotEmpty()) {
-                                    items(
-                                        items = newEpisodes,
-                                        key = { "new-episodes-${it.update.episodeId}" },
-                                    ) { item ->
-                                        LibraryComfortableGridItem(
-                                            modifier = Modifier.width(128.dp),
-                                            title = "${item.update.animeTitle} - ${item.update.episodeName}",
-                                            coverData = item.update.coverData,
-                                            onClick = { onOpenEpisode(item, false) },
-                                            onLongClick = { onUpdateSelected(item, !item.selected, true, true) },
-                                        )
-                                    }
-                                } else {
-                                    item {
-                                        Text(
-                                            text = stringResource(MR.strings.information_no_recent),
-                                            modifier = Modifier.padding(MaterialTheme.padding.small),
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                        animeUpdatesUiItems(
+                            uiModels = state.getUiModel(),
+                            selectionMode = state.selectionMode,
+                            onUpdateSelected = onUpdateSelected,
+                            onClickCover = { item -> onClickCover(item.update.animeId) },
+                            onClickUpdate = onOpenEpisode,
+                            onDownloadEpisode = onDownloadEpisode,
+                        )
                     }
                 }
             }
