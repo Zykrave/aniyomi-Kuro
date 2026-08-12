@@ -1,6 +1,7 @@
 package eu.kanade.presentation.browse.anime
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,7 +55,8 @@ fun AnimeSourcesScreen(
         )
         else -> {
             ScrollbarLazyColumn(
-                contentPadding = contentPadding + topSmallPaddingValues,
+                contentPadding = contentPadding + topSmallPaddingValues + PaddingValues(horizontal = MaterialTheme.padding.medium),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
             ) {
                 items(
                     items = state.items,
