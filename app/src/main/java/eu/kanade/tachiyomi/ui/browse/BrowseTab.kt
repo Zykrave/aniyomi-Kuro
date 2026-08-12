@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TabRow
@@ -37,6 +34,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import eu.kanade.presentation.components.AppBarActions
 import eu.kanade.presentation.components.AppBarTitle
 import eu.kanade.presentation.components.SearchToolbar
+import eu.kanade.presentation.components.SegmentedPill
 import eu.kanade.presentation.components.TabContent
 import eu.kanade.presentation.util.Tab
 import eu.kanade.tachiyomi.R
@@ -130,24 +128,15 @@ data object BrowseTab : Tab {
         onSelect: (Int) -> Unit,
         modifier: Modifier = Modifier,
     ) {
-        val options = persistentListOf(
-            stringResource(AYMR.strings.label_anime),
-            stringResource(AYMR.strings.label_manga),
+        SegmentedPill(
+            selectedIndex = selectedIndex,
+            items = persistentListOf(
+                stringResource(AYMR.strings.label_anime),
+                stringResource(AYMR.strings.label_manga),
+            ),
+            onSelect = onSelect,
+            modifier = modifier,
         )
-        SingleChoiceSegmentedButtonRow(modifier = modifier) {
-            options.forEachIndexed { index, label ->
-                SegmentedButton(
-                    selected = index == selectedIndex,
-                    onClick = { onSelect(index) },
-                    shape = SegmentedButtonDefaults.itemShape(index, options.size),
-                ) {
-                    Text(
-                        text = label,
-                        maxLines = 1,
-                    )
-                }
-            }
-        }
     }
 
     @Composable

@@ -55,6 +55,7 @@ data object UpdatesTab : Tab {
                 animeUpdatesTab(context, fromMore),
                 mangaUpdatesTab(context, fromMore),
             ),
+            isPill = true,
         )
 
         LaunchedEffect(Unit) {
