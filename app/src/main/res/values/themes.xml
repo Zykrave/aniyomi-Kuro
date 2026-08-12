@@ -10,6 +10,8 @@
         <!-- Disallow "Force dark theme" -->
         <item name="android:forceDarkAllowed" tools:targetApi="Q">false</item>
 
+        <item name="android:windowBackground">@color/splash</item>
+
         <!-- Theme Colors -->
         <item name="colorPrimary">@color/tachiyomi_primary</item>
         <item name="colorOnPrimary">@color/tachiyomi_onPrimary</item>
@@ -657,16 +659,18 @@
     <!--===============-->
 
     <!--== Splash Theme ==-->
-    <style name="Theme.Tachiyomi.SplashScreen" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        <item name="android:windowSplashScreenBrandingImage">@drawable/ic_wordmark_branding</item>
+    <style name="Base.Theme.Tachiyomi.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_blank</item>
         <item name="windowSplashScreenBackground">@color/splash</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash</item>
         <item name="postSplashScreenTheme">@style/Theme.Tachiyomi</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
+
+    <style name="Theme.Tachiyomi.SplashScreen" parent="Base.Theme.Tachiyomi.SplashScreen" />
 
 
     <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
