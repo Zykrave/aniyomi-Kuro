@@ -247,6 +247,8 @@ class MainActivity : BaseActivity() {
 
                         // Reset Incognito Mode on relaunch
                         preferences.incognitoMode().set(false)
+                    } else {
+                        ready = true
                     }
                 }
                 LaunchedEffect(navigator.lastItem) {
@@ -640,6 +642,9 @@ class MainActivity : BaseActivity() {
 
     @Composable
     private fun AmbientBackground(modifier: Modifier = Modifier) {
+        val primaryColor = MaterialTheme.colorScheme.primary
+        val secondaryColor = MaterialTheme.colorScheme.secondary
+
         val infiniteTransition = rememberInfiniteTransition(label = "ambient")
         val offset1 by infiniteTransition.animateFloat(
             initialValue = 0f,
@@ -685,7 +690,7 @@ class MainActivity : BaseActivity() {
             val center1 = Offset(canvasWidth * (0.2f + offset1 * 0.3f), canvasHeight * (0.15f + offset1 * 0.2f))
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(ComposeColor(0xFFFF4D6D).copy(alpha = 0.12f), ComposeColor.Transparent),
+                    colors = listOf(primaryColor.copy(alpha = 0.12f), ComposeColor.Transparent),
                     center = center1,
                     radius = radius1,
                 ),
@@ -697,7 +702,7 @@ class MainActivity : BaseActivity() {
             val center2 = Offset(canvasWidth * (0.8f - offset2 * 0.3f), canvasHeight * (0.7f - offset2 * 0.2f))
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(ComposeColor(0xFF5AC8FA).copy(alpha = 0.10f), ComposeColor.Transparent),
+                    colors = listOf(secondaryColor.copy(alpha = 0.10f), ComposeColor.Transparent),
                     center = center2,
                     radius = radius2,
                 ),

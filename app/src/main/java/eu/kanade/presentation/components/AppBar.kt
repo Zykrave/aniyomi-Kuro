@@ -148,6 +148,7 @@ fun AppBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     val hazeState = LocalHazeState.current
+    val hazeTint = if (isSystemInDarkTheme()) Color.Black.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.2f)
     Column(
         modifier = modifier.then(
             if (hazeState != null) {
@@ -155,7 +156,7 @@ fun AppBar(
                     state = hazeState,
                     style = HazeStyle(
                         blurRadius = 20.dp,
-                        tint = HazeTint(Color.Black.copy(alpha = 0.4f)),
+                        tint = HazeTint(hazeTint),
                     ),
                 )
             } else {

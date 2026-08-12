@@ -53,12 +53,12 @@ internal object TachiyomiColorScheme : BaseColorScheme() {
     )
 
     override val lightScheme = lightColorScheme(
-        primary = Color(0xFFB3001E),
+        primary = Color(0xFFFF4D6D),
         onPrimary = Color(0xFFFFFFFF),
         primaryContainer = Color(0xFFFFDAD9),
         onPrimaryContainer = Color(0xFF410004),
-        inversePrimary = Color(0xFFB0C6FF),
-        secondary = Color(0xFF0067AC), // Unread badge
+        inversePrimary = Color(0xFFFFB0C1),
+        secondary = Color(0xFF5AC8FA), // Unread badge
         onSecondary = Color(0xFFFFFFFF), // Unread badge text
         secondaryContainer = Color(0xFFCDE5FF), // Navigation bar selector pill & progress indicator (remaining)
         onSecondaryContainer = Color(0xFF001D2F), // Navigation bar selector icon
@@ -66,25 +66,25 @@ internal object TachiyomiColorScheme : BaseColorScheme() {
         onTertiary = Color(0xFFFFFFFF), // Downloaded badge text
         tertiaryContainer = Color(0xFF95F990),
         onTertiaryContainer = Color(0xFF002203),
-        background = Color(0xFFFEFBFF),
+        background = Color(0xFFFDFBFF),
         onBackground = Color(0xFF1B1B1F),
-        surface = Color(0xFFFEFBFF),
+        surface = Color(0xFFFDFBFF),
         onSurface = Color(0xFF1B1B1F),
-        surfaceVariant = Color(0xFFF3EDF7), // Navigation bar background (ThemePrefWidget)
-        onSurfaceVariant = Color(0xFF44464F),
-        surfaceTint = Color(0xFF0058CA),
-        inverseSurface = Color(0xFF303034),
-        inverseOnSurface = Color(0xFFF2F0F4),
+        surfaceVariant = Color(0xFFFDEEF2), // Soft pink-ish white for variant
+        onSurfaceVariant = Color(0xFF534346),
+        surfaceTint = Color(0xFFFF4D6D),
+        inverseSurface = Color(0xFF362F30),
+        inverseOnSurface = Color(0xFFFBEEEE),
         error = Color(0xFFBA1A1A),
         onError = Color(0xFFFFFFFF),
         errorContainer = Color(0xFFFFDAD6),
         onErrorContainer = Color(0xFF410002),
-        outline = Color(0xFF757780),
-        outlineVariant = Color(0xFFC5C6D0),
-        surfaceContainerLowest = Color(0xFFF5F1F8),
-        surfaceContainerLow = Color(0xFFF7F2FA),
-        surfaceContainer = Color(0xFFF3EDF7), // Navigation bar background
-        surfaceContainerHigh = Color(0xFFFCF7FF),
-        surfaceContainerHighest = Color(0xFFFCF7FF),
+        outline = Color(0xFF857375),
+        outlineVariant = Color(0xFFD8C2C4),
+        surfaceContainerLowest = Color(0xFFFFFFFF),
+        surfaceContainerLow = Color(0xFFFDF8F9),
+        surfaceContainer = Color(0xFFF7F2F3), // Navigation bar background
+        surfaceContainerHigh = Color(0xFFF1EDEE),
+        surfaceContainerHighest = Color(0xFFEBE7E8),
     )
 }

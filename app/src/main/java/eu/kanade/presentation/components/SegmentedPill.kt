@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ fun SegmentedPill(
     modifier: Modifier = Modifier,
 ) {
     val hazeState = LocalHazeState.current
+    val hazeTint = if (isSystemInDarkTheme()) Color.Black.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.2f)
 
     BoxWithConstraints(
         modifier = modifier
@@ -52,7 +54,7 @@ fun SegmentedPill(
                         state = hazeState,
                         style = HazeStyle(
                             blurRadius = 20.dp,
-                            tint = HazeTint(Color.Black.copy(alpha = 0.4f)),
+                            tint = HazeTint(hazeTint),
                         ),
                     )
                 } else {

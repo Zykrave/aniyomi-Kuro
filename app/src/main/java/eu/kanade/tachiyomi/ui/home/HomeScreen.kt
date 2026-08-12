@@ -8,6 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -146,11 +147,13 @@ object HomeScreen : Screen() {
                                             )
                                             .then(
                                                 if (hazeState != null) {
+                                                    val isDark = isSystemInDarkTheme()
+                                                    val hazeTint = if (isDark) Color.Black.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.2f)
                                                     Modifier.hazeEffect(
                                                         state = hazeState,
                                                         style = HazeStyle(
                                                             blurRadius = 20.dp,
-                                                            tint = HazeTint(Color.Black.copy(alpha = 0.4f)),
+                                                            tint = HazeTint(hazeTint),
                                                         ),
                                                     )
                                                 } else {
