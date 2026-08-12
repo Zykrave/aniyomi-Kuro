@@ -7,11 +7,15 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -127,32 +131,16 @@ object HomeScreen : Screen() {
                                 enter = expandVertically(),
                                 exit = shrinkVertically(),
                             ) {
-                                Box(
+                                Row(
                                     modifier = Modifier
                                         .navigationBarsPadding()
-                                        .padding(bottom = 12.dp, start = 16.dp, end = 16.dp),
-                                    contentAlignment = Alignment.Center,
+                                        .padding(bottom = 12.dp, start = 16.dp, end = 16.dp)
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    NavigationBar(
-                                        modifier = Modifier
-                                            .shadow(MaterialTheme.elevation.level4, CircleShape)
-                                            .clip(CircleShape)
-                                            .then(
-                                                hazeState?.let {
-                                                    Modifier.hazeEffect(
-                                                        state = it,
-                                                        style = HazeStyle(
-                                                            blurRadius = 20.dp,
-                                                            tint = HazeTint(Color.Black.copy(alpha = 0.4f)),
-                                                        ),
-                                                    )
-                                                } ?: Modifier,
-                                            ),
-                                        containerColor = Color.Transparent,
-                                    ) {
-                                        navStyle.tabs.fastForEach {
-                                            NavigationBarItem(it)
-                                        }
+                                    navStyle.tabs.fastForEach {
+                                        FloatingNavigationButton(it)
                                     }
                                 }
                             }
@@ -291,6 +279,45 @@ object HomeScreen : Screen() {
                 indicatorColor = Color.Transparent,
             ),
         )
+    }
+
+    @Composable
+    private fun FloatingNavigationButton(tab: eu.kanade.presentation.util.Tab) {
+        val tabNavigator = LocalTabNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
+        val scope = rememberCoroutineScope()
+        val selected = tabNavigator.current::class == tab::class
+
+        Box(
+            modifier = Modifier
+                .size(52.dp)
+                .shadow(
+                    elevation = if (selected) MaterialTheme.elevation.level4 else MaterialTheme.elevation.level3,
+                    shape = CircleShape,
+                )
+                .clip(CircleShape)
+                .background(
+                    if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                )
+                .clickable {
+                    if (!selected) {
+                        tabNavigator.current = tab
+                    } else {
+                        scope.launch { tab.onReselect(navigator) }
+                    }
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            CompositionLocalProvider(
+                LocalContentColor provides if (selected) {
+                    MaterialTheme.colorScheme.onPrimary
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                },
+            ) {
+                NavigationIconItem(tab)
+            }
+        }
     }
 
     @Composable

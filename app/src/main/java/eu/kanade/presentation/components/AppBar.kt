@@ -357,7 +357,7 @@ fun PillSearchToolbar(
             modifier = Modifier
                 .weight(1f)
                 .height(48.dp)
-                .shadow(elevation = 2.dp, shape = CircleShape)
+                .shadow(elevation = 6.dp, shape = CircleShape)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surface)
                 .border(
