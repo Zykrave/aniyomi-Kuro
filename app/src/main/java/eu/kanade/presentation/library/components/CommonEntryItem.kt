@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -124,6 +125,7 @@ fun EntryCompactGridItem(
                     CoverTextOverlay(
                         title = title,
                         onClickContinueViewing = onClickContinueViewing,
+                        compact = true,
                     )
                 } else if (onClickContinueViewing != null) {
                     ContinueViewingButton(
@@ -146,7 +148,9 @@ fun EntryCompactGridItem(
 @Composable
 private fun BoxScope.CoverTextOverlay(
     title: String,
+    subtitle: String? = null,
     onClickContinueViewing: (() -> Unit)? = null,
+    compact: Boolean = false,
 ) {
     Box(
         modifier = Modifier
@@ -154,10 +158,10 @@ private fun BoxScope.CoverTextOverlay(
             .background(
                 Brush.verticalGradient(
                     0f to Color.Transparent,
-                    1f to Color(0xAA000000),
+                    1f to Color.Black.copy(alpha = 0.9f),
                 ),
             )
-            .fillMaxHeight(0.33f)
+            .fillMaxHeight(if (compact) 0.33f else 0.45f)
             .fillMaxWidth()
             .align(Alignment.BottomCenter),
     )
@@ -165,24 +169,53 @@ private fun BoxScope.CoverTextOverlay(
         modifier = Modifier.align(Alignment.BottomStart),
         verticalAlignment = Alignment.Bottom,
     ) {
-        GridItemTitle(
+        Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(8.dp),
-            title = title,
-            style = MaterialTheme.typography.titleSmall.copy(
-                color = Color.White,
-                shadow = Shadow(
-                    color = Color.Black,
-                    blurRadius = 4f,
-                ),
-            ),
-            minLines = 1,
-        )
+                .padding(if (compact) 8.dp else 12.dp),
+        ) {
+            GridItemTitle(
+                title = title,
+                style = if (compact) {
+                    MaterialTheme.typography.titleSmall.copy(
+                        color = Color.White,
+                        shadow = Shadow(
+                            color = Color.Black,
+                            blurRadius = 4f,
+                        ),
+                    )
+                } else {
+                    MaterialTheme.typography.titleMedium.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        shadow = Shadow(
+                            color = Color.Black,
+                            blurRadius = 4f,
+                        ),
+                    )
+                },
+                minLines = 1,
+                compact = compact,
+            )
+            if (subtitle != null && !compact) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = Color.White.copy(alpha = 0.8f),
+                        shadow = Shadow(
+                            color = Color.Black,
+                            blurRadius = 4f,
+                        ),
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
         if (onClickContinueViewing != null) {
             ContinueViewingButton(
-                size = ContinueViewingButtonSizeSmall,
-                iconSize = ContinueViewingButtonIconSizeSmall,
+                size = if (compact) ContinueViewingButtonSizeSmall else ContinueViewingButtonSizeLarge,
+                iconSize = if (compact) ContinueViewingButtonIconSizeSmall else ContinueViewingButtonIconSizeLarge,
                 onClick = onClickContinueViewing,
                 modifier = Modifier.padding(
                     end = ContinueViewingButtonGridPadding,
@@ -347,6 +380,7 @@ fun LibraryCompactGridItem(
                     CoverTextOverlay(
                         title = title,
                         onClickContinueViewing = onClickContinueViewing,
+                        compact = true,
                     )
                 } else if (onClickContinueViewing != null) {
                     ContinueViewingButton(
@@ -388,51 +422,27 @@ fun LibraryComfortableGridItem(
         modifier = modifier,
         compact = compact,
     ) {
-        Column {
-            LibraryGridCover(
-                cover = {
-                    ItemCover.Book(
-                        modifier = Modifier.fillMaxWidth(),
-                        data = coverData,
-                        shape = RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large),
-                    )
-                },
-                progress = progress,
-                badgesStart = coverBadgeStart,
-                badgesEnd = coverBadgeEnd,
-                compact = compact,
-                content = {
-                    if (onClickContinueViewing != null) {
-                        ContinueViewingButton(
-                            size = ContinueViewingButtonSizeLarge,
-                            iconSize = ContinueViewingButtonIconSizeLarge,
-                            onClick = onClickContinueViewing,
-                            modifier = Modifier
-                                .padding(ContinueViewingButtonGridPadding)
-                                .align(Alignment.BottomEnd),
-                        )
-                    }
-                },
-            )
-            GridItemTitle(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = if (compact) 4.dp else 0.dp),
-                title = title,
-                style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.titleSmall,
-                minLines = if (compact) 1 else 2,
-                maxLines = if (compact) 1 else 2,
-                compact = compact,
-            )
-            if (subtitle != null && !compact) {
-                Text(
-                    text = subtitle,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+        LibraryGridCover(
+            cover = {
+                ItemCover.Book(
+                    modifier = Modifier.fillMaxWidth(),
+                    data = coverData,
+                    shape = androidx.compose.ui.graphics.RectangleShape,
                 )
-            }
-        }
+            },
+            progress = progress,
+            badgesStart = coverBadgeStart,
+            badgesEnd = coverBadgeEnd,
+            compact = compact,
+            content = {
+                CoverTextOverlay(
+                    title = title,
+                    subtitle = subtitle,
+                    onClickContinueViewing = onClickContinueViewing,
+                    compact = compact,
+                )
+            },
+        )
     }
 }
 
@@ -472,7 +482,7 @@ private fun LibraryGridItemSelectable(
                 }
                 .then(if (compact) Modifier.width(90.dp) else Modifier)
                 .shadow(
-                    elevation = if (compact) 1.dp else MaterialTheme.elevation.level2,
+                    elevation = if (compact) 1.dp else MaterialTheme.elevation.level3,
                     shape = RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large),
                 )
                 .clip(RoundedCornerShape(if (compact) 10.dp else MaterialTheme.radius.large))
@@ -539,7 +549,7 @@ private fun LibraryGridCover(
         if (badgesStart != null) {
             BadgeGroup(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(if (compact) 4.dp else 8.dp)
                     .align(Alignment.TopStart),
                 content = badgesStart,
             )
@@ -548,7 +558,7 @@ private fun LibraryGridCover(
         if (badgesEnd != null) {
             BadgeGroup(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(if (compact) 4.dp else 8.dp)
                     .align(Alignment.TopEnd),
                 content = badgesEnd,
             )

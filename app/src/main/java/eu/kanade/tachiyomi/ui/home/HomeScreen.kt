@@ -131,16 +131,41 @@ object HomeScreen : Screen() {
                                 enter = expandVertically(),
                                 exit = shrinkVertically(),
                             ) {
-                                Row(
+                                Box(
                                     modifier = Modifier
                                         .navigationBarsPadding()
                                         .padding(bottom = 12.dp, start = 16.dp, end = 16.dp)
                                         .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically,
+                                    contentAlignment = Alignment.Center,
                                 ) {
-                                    navStyle.tabs.fastForEach {
-                                        FloatingNavigationButton(it)
+                                    Row(
+                                        modifier = Modifier
+                                            .shadow(
+                                                elevation = 8.dp,
+                                                shape = CircleShape,
+                                            )
+                                            .then(
+                                                if (hazeState != null) {
+                                                    Modifier.hazeEffect(
+                                                        state = hazeState,
+                                                        style = HazeStyle(
+                                                            blurRadius = 20.dp,
+                                                            tint = HazeTint(Color.Black.copy(alpha = 0.4f)),
+                                                        ),
+                                                    )
+                                                } else {
+                                                    Modifier
+                                                },
+                                            )
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        navStyle.tabs.fastForEach {
+                                            FloatingNavigationButton(it)
+                                        }
                                     }
                                 }
                             }
@@ -291,13 +316,9 @@ object HomeScreen : Screen() {
         Box(
             modifier = Modifier
                 .size(52.dp)
-                .shadow(
-                    elevation = if (selected) MaterialTheme.elevation.level4 else MaterialTheme.elevation.level3,
-                    shape = CircleShape,
-                )
                 .clip(CircleShape)
                 .background(
-                    if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                    if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
                 )
                 .clickable {
                     if (!selected) {
