@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Application
 import android.app.SearchManager
 import android.app.assist.AssistContent
+import android.util.Log
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -28,6 +29,9 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -61,7 +65,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -180,6 +183,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("KURO_PERF", "MainActivity.onCreate START ${System.currentTimeMillis()}")
         val isLaunch = savedInstanceState == null
 
         // Prevent splash screen showing up on configuration changes
@@ -187,7 +191,9 @@ class MainActivity : BaseActivity() {
 
         super.onCreate(savedInstanceState)
 
+        Log.d("KURO_PERF", "Migrator await START ${System.currentTimeMillis()}")
         val didMigration = Migrator.awaitAndRelease()
+        Log.d("KURO_PERF", "Migrator await END ${System.currentTimeMillis()}")
 
         // Do not let the launcher create a new activity http://stackoverflow.com/questions/16283079
         if (!isTaskRoot) {
@@ -195,16 +201,9 @@ class MainActivity : BaseActivity() {
             return
         }
 
+        Log.d("KURO_PERF", "setComposeContent START ${System.currentTimeMillis()}")
         setComposeContent {
             val context = LocalContext.current
-
-            var showCustomSplash by remember { mutableStateOf(true) }
-            LaunchedEffect(ready) {
-                if (ready) {
-                    delay(800)
-                    showCustomSplash = false
-                }
-            }
 
             var incognito by remember { mutableStateOf(getMangaIncognitoState.await(null)) }
             var incognitoAnime by remember { mutableStateOf(getAnimeIncognitoState.await(null)) }
@@ -297,25 +296,6 @@ class MainActivity : BaseActivity() {
                                         .background(MaterialTheme.colorScheme.surfaceContainer),
                                 )
                             }
-
-                            AnimatedVisibility(
-                                visible = showCustomSplash,
-                                enter = EnterTransition.None,
-                                exit = fadeOut(animationSpec = tween(500)),
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.background),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.ic_wordmark_splash),
-                                        contentDescription = null,
-                                        modifier = Modifier.width(240.dp),
-                                    )
-                                }
-                            }
                         }
                     }
                 }
@@ -371,11 +351,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        val startTime = System.currentTimeMillis()
-        splashScreen?.setKeepOnScreenCondition {
-            val elapsed = System.currentTimeMillis() - startTime
-            elapsed <= SPLASH_MIN_DURATION || !ready && elapsed <= SPLASH_MAX_DURATION
-        }
+        splashScreen?.setKeepOnScreenCondition { !ready }
         setSplashScreenExitAnimation(splashScreen)
 
         if (isLaunch && libraryPreferences.autoClearItemCache().get()) {
@@ -452,8 +428,8 @@ class MainActivity : BaseActivity() {
         // Extensions updates
         LaunchedEffect(Unit) {
             try {
-                AnimeExtensionApi().checkForUpdates(context)
-                MangaExtensionApi().checkForUpdates(context)
+                AnimeExtensionApi().checkForUpdates(context, fromAvailableExtensionList = true)
+                MangaExtensionApi().checkForUpdates(context, fromAvailableExtensionList = true)
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e)
             }
@@ -685,30 +661,65 @@ class MainActivity : BaseActivity() {
         Canvas(modifier = modifier.fillMaxSize()) {
             val canvasWidth = size.width
             val canvasHeight = size.height
+            val shardWidth = canvasWidth * 0.04f
 
-            val radius1 = canvasWidth * 0.5f * scale1
-            val center1 = Offset(canvasWidth * (0.2f + offset1 * 0.3f), canvasHeight * (0.15f + offset1 * 0.2f))
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.12f), ComposeColor.Transparent),
-                    center = center1,
-                    radius = radius1,
-                ),
-                radius = radius1,
-                center = center1,
+            // Shard 1 (Crimson/Primary) - Top-Left quadrant area
+            val shard1Length = canvasWidth * 0.9f * scale1
+            val center1 = Offset(
+                canvasWidth * (0.2f + offset1 * 0.3f),
+                canvasHeight * (0.15f + offset1 * 0.2f),
             )
 
-            val radius2 = canvasWidth * 0.45f * scale2
-            val center2 = Offset(canvasWidth * (0.8f - offset2 * 0.3f), canvasHeight * (0.7f - offset2 * 0.2f))
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(secondaryColor.copy(alpha = 0.10f), ComposeColor.Transparent),
-                    center = center2,
-                    radius = radius2,
-                ),
-                radius = radius2,
-                center = center2,
+            rotate(-35f, pivot = center1) {
+                val path1 = Path().apply {
+                    moveTo(center1.x - shard1Length / 2, center1.y)
+                    lineTo(center1.x, center1.y - shardWidth / 2)
+                    lineTo(center1.x + shard1Length / 2, center1.y)
+                    lineTo(center1.x, center1.y + shardWidth / 2)
+                    close()
+                }
+                drawPath(
+                    path = path1,
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            ComposeColor.Transparent,
+                            primaryColor.copy(alpha = 0.18f),
+                            ComposeColor.Transparent,
+                        ),
+                        start = Offset(center1.x - shard1Length / 2, center1.y),
+                        end = Offset(center1.x + shard1Length / 2, center1.y),
+                    ),
+                )
+            }
+
+            // Shard 2 (Secondary) - Bottom-Right quadrant area
+            val shard2Length = canvasWidth * 0.9f * scale2
+            val center2 = Offset(
+                canvasWidth * (0.8f - offset2 * 0.3f),
+                canvasHeight * (0.7f - offset2 * 0.2f),
             )
+
+            rotate(-40f, pivot = center2) {
+                val path2 = Path().apply {
+                    moveTo(center2.x - shard2Length / 2, center2.y)
+                    lineTo(center2.x, center2.y - shardWidth / 2)
+                    lineTo(center2.x + shard2Length / 2, center2.y)
+                    lineTo(center2.x, center2.y + shardWidth / 2)
+                    close()
+                }
+                drawPath(
+                    path = path2,
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            ComposeColor.Transparent,
+                            secondaryColor.copy(alpha = 0.10f),
+                            ComposeColor.Transparent,
+                        ),
+                        start = Offset(center2.x - shard2Length / 2, center2.y),
+                        end = Offset(center2.x + shard2Length / 2, center2.y),
+                    ),
+                )
+            }
         }
     }
 

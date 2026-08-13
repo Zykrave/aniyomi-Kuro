@@ -10,8 +10,6 @@
         <!-- Disallow "Force dark theme" -->
         <item name="android:forceDarkAllowed" tools:targetApi="Q">false</item>
 
-        <item name="android:windowBackground">@color/splash</item>
-
         <!-- Theme Colors -->
         <item name="colorPrimary">@color/tachiyomi_primary</item>
         <item name="colorOnPrimary">@color/tachiyomi_onPrimary</item>
@@ -660,7 +658,7 @@
 
     <!--== Splash Theme ==-->
     <style name="Base.Theme.Tachiyomi.SplashScreen" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_blank</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_wordmark_k</item>
         <item name="windowSplashScreenBackground">@color/splash</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/splash</item>
         <item name="postSplashScreenTheme">@style/Theme.Tachiyomi</item>

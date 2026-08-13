@@ -3,6 +3,7 @@ package eu.kanade.tachiyomi
 import android.annotation.SuppressLint
 import android.app.Application
 import android.app.PendingIntent
+import android.util.Log
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -80,6 +81,7 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
 
     @SuppressLint("LaunchActivityFromNotification")
     override fun onCreate() {
+        Log.d("KURO_PERF", "App.onCreate START ${System.currentTimeMillis()}")
         super<Application>.onCreate()
         patchInjekt()
 
@@ -162,6 +164,7 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
         }
 
         initializeMigrator()
+        Log.d("KURO_PERF", "App.onCreate END ${System.currentTimeMillis()}")
     }
 
     private fun initializeMigrator() {

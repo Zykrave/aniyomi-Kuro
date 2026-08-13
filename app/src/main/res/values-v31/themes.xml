@@ -44,7 +44,7 @@
 
     <style name="Theme.Tachiyomi.SplashScreen" parent="Base.Theme.Tachiyomi.SplashScreen">
         <item name="android:windowSplashScreenBackground">@color/splash</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_blank</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_wordmark_k</item>
         <item name="android:windowSplashScreenIconBackgroundColor">@color/splash</item>
     </style>
 </resources>
